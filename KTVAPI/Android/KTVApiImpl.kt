@@ -59,6 +59,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     private var mainSingerUid: Int = 0
     private var songCode: Long = 0
     private var songUrl: String = ""
+    private var songUrl2: String = ""
     private var songIdentifier: String = ""
 
     private val lyricCallbackMap =
@@ -463,7 +464,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         url: String,
         config: KTVLoadMusicConfiguration
     ) {
-        Log.d(TAG, "loadMusic called: songCode $songCode")
+        Log.d(TAG, "loadMusic called: songUrl $url")
         this.songMode = KTVSongMode.SONG_URL
         this.songIdentifier = config.songIdentifier
         this.songUrl = url
@@ -478,6 +479,34 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         }
     }
 
+    override fun load2Music(url1: String, url2: String, config: KTVLoadMusicConfiguration) {
+        Log.d(TAG, "load2Music called: songUrl url1:$url1,url2:$url2")
+        this.songMode = KTVSongMode.SONG_URL
+        this.songIdentifier = config.songIdentifier
+        this.songUrl = url1
+        this.songUrl2 = url2
+        this.mainSingerUid = config.mainSingerUid
+
+        if (config.autoPlay) {
+            // 主唱自动播放歌曲
+            if (this.singerRole != KTVSingRole.LeadSinger) {
+                switchSingerRole(KTVSingRole.SoloSinger, null)
+            }
+            startSing(url1, 0)
+        }
+    }
+
+    override fun switchPlaySrc(url: String, syncPts: Boolean) {
+        Log.d(TAG, "switchPlaySrc called: $url")
+        if (this.songUrl != url || this.songUrl2 != url) {
+            Log.e(TAG, "switchPlaySrc failed: canceled")
+            return
+        }
+        val curPlayPosition = if (syncPts) mPlayer.playPosition else 0
+        mPlayer.stop()
+        startSing(url, curPlayPosition)
+    }
+
     override fun startSing(songCode: Long, startPos: Long) {
         Log.d(TAG, "playSong called: $singerRole")
         if (this.songCode != songCode) {
@@ -490,7 +519,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     override fun startSing(url: String, startPos: Long) {
         Log.d(TAG, "playSong called: $singerRole")
-        if (this.songUrl != url) {
+        if (this.songUrl != url || this.songUrl2 != url) {
             Log.e(TAG, "startSing failed: canceled")
             return
         }
