@@ -89,8 +89,9 @@ interface ILrcView {
     /**
      * ktvApi内部更新音乐播放进度progress时会主动调用此方法将进度值progress传给你的歌词组件，50ms回调一次
      * @param progress 歌曲播放的真实进度 20ms回调一次
+     * @param duration 歌曲总进度
      */
-    fun onUpdateProgress(progress: Long?)
+    fun onUpdateProgress(progress: Long?,duration: Long)
 
     /**
      * ktvApi获取到歌词地址时会主动调用此方法将歌词地址url传给你的歌词组件，您需要在这个回调内完成歌词的下载

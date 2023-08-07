@@ -38,7 +38,7 @@ class KTVApiImpl : KTVApi, IMediaPlayerObserver, IRtcEngineEventHandler() {
     private val TAG: String = "KTV_API_LOG"
 
     // 外部可修改
-    var songMode:KTVSongMode = KTVSongMode.SONG_CODE
+    var songMode: KTVSongMode = KTVSongMode.SONG_CODE
     var useCustomAudioSource:Boolean = false
 
     // 音频最佳实践
@@ -327,7 +327,7 @@ class KTVApiImpl : KTVApi, IMediaPlayerObserver, IRtcEngineEventHandler() {
 
     override fun switchPlaySrc(url: String, syncPts: Boolean) {
         Log.d(TAG, "switchPlaySrc called: $url")
-        if (this.songUrl != url || this.songUrl2 != url) {
+        if (this.songUrl != url && this.songUrl2 != url) {
             Log.e(TAG, "switchPlaySrc failed: canceled")
             return
         }
@@ -338,7 +338,7 @@ class KTVApiImpl : KTVApi, IMediaPlayerObserver, IRtcEngineEventHandler() {
 
     override fun startSing(url: String, startPos: Long) {
         Log.d(TAG, "playSong called: $singerRole")
-        if (this.songUrl != url || this.songUrl2 != url) {
+        if (this.songUrl != url && this.songUrl2 != url) {
             Log.e(TAG, "startSing failed: canceled")
             return
         }
@@ -648,7 +648,8 @@ class KTVApiImpl : KTVApi, IMediaPlayerObserver, IRtcEngineEventHandler() {
                         // Per suggestion from Bob, it has a intrinsic buffer/delay between sound and `onPositionChanged(Player)`,
                         // such as AEC/Player/Device buffer.
                         // We choose the estimated 200ms.
-                        lrcView?.onUpdateProgress(if (curTs > 200) (curTs - 200) else curTs) // The delay here will impact both singer and audience side
+                        lrcView?.onUpdateProgress(if (curTs > 200) (curTs - 200) else curTs,duration) // The delay here will
+                    // impact both singer and audience side
                     }
                 }
             }
