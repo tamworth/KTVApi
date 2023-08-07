@@ -2,9 +2,6 @@ package io.agora.ktvapi
 
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayer
-import io.agora.musiccontentcenter.IAgoraMusicContentCenter
-import io.agora.musiccontentcenter.Music
-import io.agora.musiccontentcenter.MusicChartInfo
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 
@@ -185,29 +182,28 @@ abstract class IKTVApiEventHandler {
     open fun onChorusChannelAudioVolumeIndication(
         speakers: Array<out IRtcEngineEventHandler.AudioVolumeInfo>?,
         totalVolume: Int) {}
+
+    /**
+     * 歌曲打开失败，参考原因 MediaPlayerError
+     */
+    open fun onOpenSongError(errorCode:Int){}
 }
 
 /**
  * 初始化KTVApi的配置
- * @param appId 用来初始化 Mcc Engine
- * @param rtmToken 创建 Mcc Engine 需要
  * @param engine RTC engine 对象
  * @param channelName 频道号，子频道名以基于主频道名 + "_ex" 固定规则生成频道号
  * @param localUid 创建 Mcc engine 和 加入子频道需要用到
  * @param chorusChannelName 子频道名 加入子频道需要用到
  * @param chorusChannelToken 子频道token 加入子频道需要用到
- * @param maxCacheSize 最大缓存歌曲数
  * @param type KTV场景
  */
 data class KTVApiConfig(
-    val appId: String,
-    val rtmToken: String,
     val engine: RtcEngine,
     val channelName: String,
     val localUid: Int,
     val chorusChannelName: String,
     val chorusChannelToken: String,
-    val maxCacheSize: Int = 10,
     val type: KTVType = KTVType.Normal
 )
 
@@ -256,7 +252,6 @@ interface KTVApi {
 
     /**
      * 收到 IKTVApiEventHandler.onTokenPrivilegeWillExpire 回调时需要主动调用方法更新Token
-     * @param rtmToken musicContentCenter模块需要的rtm token
      * @param chorusChannelRtcToken 合唱需要的频道rtc token
      */
     fun renewToken(chorusChannelRtcToken: String)

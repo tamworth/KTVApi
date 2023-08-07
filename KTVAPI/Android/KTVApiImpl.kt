@@ -343,7 +343,12 @@ class KTVApiImpl : KTVApi, IMediaPlayerObserver, IRtcEngineEventHandler() {
             return
         }
         mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
-        mPlayer.open(url, startPos)
+        val ret = mPlayer.open(url, startPos)
+        if (ret!=0){
+            ktvApiEventHandlerList.forEach{
+                it.onOpenSongError(ret)
+            }
+        }
     }
 
     override fun resumeSing() {
@@ -415,7 +420,15 @@ class KTVApiImpl : KTVApi, IMediaPlayerObserver, IRtcEngineEventHandler() {
                 mRtcEngine.updateChannelMediaOptions(channelMediaOption)
 
                 // 预加载歌曲成功
-                mPlayer.open(songUrl, 0) // TODO open failed
+                val ret = mPlayer.open(songUrl, 0) // TODO open failed
+                if (ret != 0) {
+                    ktvApiEventHandlerList.forEach {
+                        it.onOpenSongError(ret)
+                    }
+                    // 加入第二频道失败
+                    onJoinChorusStateListener.onJoinChorusFail(KTVJoinChorusFailReason.MUSIC_OPEN_FAIL)
+                    return
+                }
 
                 // 预加载成功后加入第二频道：预加载时间>>joinChannel时间
                 joinChorus2ndChannel(newRole, token, mainSingerUid) { joinStatus ->
