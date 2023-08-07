@@ -34,8 +34,7 @@ interface OnJoinChorusStateListener {
     fun onJoinChorusFail(reason: KTVJoinChorusFailReason)
 }
 
-class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver,
-    IRtcEngineEventHandler() {
+class KTVApiImpl : KTVApi, IMediaPlayerObserver, IRtcEngineEventHandler() {
     private val TAG: String = "KTV_API_LOG"
 
     // 外部可修改
@@ -49,32 +48,16 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
     private lateinit var mRtcEngine: RtcEngineEx
-    private lateinit var mMusicCenter: IAgoraMusicContentCenter
-    private lateinit var mPlayer: IAgoraMusicPlayer
+    private lateinit var mPlayer: IMediaPlayer
 
     private lateinit var ktvApiConfig: KTVApiConfig
     private var innerDataStreamId: Int = 0
     private var subChorusConnection: RtcConnection? = null
 
     private var mainSingerUid: Int = 0
-    private var songCode: Long = 0
     private var songUrl: String = ""
     private var songUrl2: String = ""
     private var songIdentifier: String = ""
-
-    private val lyricCallbackMap =
-        mutableMapOf<String, (songNo: Long, lyricUrl: String?) -> Unit>() // (requestId, callback)
-    private val lyricSongCodeMap = mutableMapOf<String, Long>() // (requestId, songCode)
-    private val loadMusicCallbackMap =
-        mutableMapOf<String, (songCode: Long,
-                              percent: Int,
-                              status: Int,
-                              msg: String?,
-                              lyricUrl: String?) -> Unit>() // (songNo, callback)
-    private val musicChartsCallbackMap =
-        mutableMapOf<String, (requestId: String?, errorCode: Int, list: Array<out MusicChartInfo>?) -> Unit>()
-    private val musicCollectionCallbackMap =
-        mutableMapOf<String, (requestId: String?, errorCode: Int, page: Int, pageSize: Int, total: Int, list: Array<out Music>?) -> Unit>()
 
     private var lrcView: ILrcView? = null
 
@@ -113,24 +96,14 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         this.mRtcEngine = config.engine as RtcEngineEx
         this.ktvApiConfig = config
 
-        // ------------------ 初始化内容中心 ------------------
-        val contentCenterConfiguration = MusicContentCenterConfiguration()
-        contentCenterConfiguration.appId = config.appId
-        contentCenterConfiguration.mccUid = ktvApiConfig.localUid.toLong()
-        contentCenterConfiguration.token = config.rtmToken
-        contentCenterConfiguration.maxCacheSize = config.maxCacheSize
-        mMusicCenter = IAgoraMusicContentCenter.create(mRtcEngine)
-        mMusicCenter.initialize(contentCenterConfiguration)
-
         // ------------------ 初始化音乐播放器实例 ------------------
-        mPlayer = mMusicCenter.createMusicPlayer()
+        mPlayer = mRtcEngine.createMediaPlayer()
         mPlayer.adjustPublishSignalVolume(mpkPublishVolume)
         mPlayer.adjustPlayoutVolume(mpkPlayoutVolume)
 
         // 注册回调
         mRtcEngine.addHandler(this)
         mPlayer.registerPlayerObserver(this)
-        mMusicCenter.registerEventHandler(this)
 
         setKTVParameters()
         startDisplayLrc()
@@ -186,15 +159,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         this.mReceivedPlayPosition = 0
         this.innerDataStreamId = 0
 
-        lyricCallbackMap.clear()
-        loadMusicCallbackMap.clear()
-        musicChartsCallbackMap.clear()
-        musicCollectionCallbackMap.clear()
         lrcView = null
 
         mRtcEngine.removeHandler(this)
         mPlayer.unRegisterPlayerObserver(this)
-        mMusicCenter.unregisterEventHandler()
 
         mPlayer.stop()
         mPlayer.destroy()
@@ -203,9 +171,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         mainSingerHasJoinChannelEx = false
     }
 
-    override fun renewToken(rtmToken: String, chorusChannelRtcToken: String) {
-        // 更新RtmToken
-        mMusicCenter.renewToken(rtmToken)
+    override fun renewToken(chorusChannelRtcToken: String) {
         // 更新合唱频道RtcToken
         if (subChorusConnection != null) {
             val channelMediaOption = ChannelMediaOptions()
@@ -323,143 +289,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         }
     }
 
-    override fun fetchMusicCharts(onMusicChartResultListener: (requestId: String?, status: Int, list: Array<out MusicChartInfo>?) -> Unit) {
-        val requestId = mMusicCenter.musicCharts
-        musicChartsCallbackMap[requestId] = onMusicChartResultListener
-    }
-
-    override fun searchMusicByMusicChartId(
-        musicChartId: Int,
-        page: Int,
-        pageSize: Int,
-        jsonOption: String,
-        onMusicCollectionResultListener: (requestId: String?, status: Int, page: Int, pageSize: Int, total: Int, list: Array<out Music>?) -> Unit
-    ) {
-        val requestId =
-            mMusicCenter.getMusicCollectionByMusicChartId(musicChartId, page, pageSize, jsonOption)
-        musicCollectionCallbackMap[requestId] = onMusicCollectionResultListener
-    }
-
-    override fun searchMusicByKeyword(
-        keyword: String,
-        page: Int,
-        pageSize: Int,
-        jsonOption: String,
-        onMusicCollectionResultListener: (requestId: String?, status: Int, page: Int, pageSize: Int, total: Int, list: Array<out Music>?) -> Unit
-    ) {
-        val requestId = mMusicCenter.searchMusic(keyword, page, pageSize, jsonOption)
-        musicCollectionCallbackMap[requestId] = onMusicCollectionResultListener
-    }
-
-    override fun loadMusic(
-        songCode: Long,
-        config: KTVLoadMusicConfiguration,
-        musicLoadStateListener: IMusicLoadStateListener
-    ) {
-        Log.d(TAG, "loadMusic called: songCode $songCode")
-        if (this.ktvApiConfig.type == KTVType.SingBattle) {
-            mMusicCenter.getSongSimpleInfo(songCode);
-        }
-        // 设置到全局， 连续调用以最新的为准
-        this.songMode = KTVSongMode.SONG_CODE
-        this.songCode = songCode
-        this.songIdentifier = config.songIdentifier
-        this.mainSingerUid = config.mainSingerUid
-        mLastReceivedPlayPosTime = null
-        mReceivedPlayPosition = 0
-
-        if (config.mode == KTVLoadMusicMode.LOAD_NONE) {
-            return
-        }
-
-        if (config.mode == KTVLoadMusicMode.LOAD_LRC_ONLY) {
-            // 只加载歌词
-            loadLyric(songCode) { song, lyricUrl ->
-                if (this.songCode != song) {
-                    // 当前歌曲已发生变化，以最新load歌曲为准
-                    Log.e(TAG, "loadMusic failed: CANCELED")
-                    musicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.CANCELED)
-                    return@loadLyric
-                }
-
-                if (lyricUrl == null) {
-                    // 加载歌词失败
-                    Log.e(TAG, "loadMusic failed: NO_LYRIC_URL")
-                    musicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.NO_LYRIC_URL)
-                } else {
-                    // 加载歌词成功
-                    Log.d(TAG, "loadMusic success")
-                    lrcView?.onDownloadLrcData(lyricUrl)
-                    musicLoadStateListener.onMusicLoadSuccess(song, lyricUrl)
-                }
-            }
-            return
-        }
-
-        // 预加载歌曲
-        preLoadMusic(songCode) { song, percent, status, msg, lrcUrl ->
-            if (status == 0) {
-                // 预加载歌曲成功
-                if (this.songCode != song) {
-                    // 当前歌曲已发生变化，以最新load歌曲为准
-                    Log.e(TAG, "loadMusic failed: CANCELED")
-                    musicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.CANCELED)
-                    return@preLoadMusic
-                }
-                if (config.mode == KTVLoadMusicMode.LOAD_MUSIC_AND_LRC) {
-                    // 需要加载歌词
-                    loadLyric(song) { _, lyricUrl ->
-                        if (this.songCode != song) {
-                            // 当前歌曲已发生变化，以最新load歌曲为准
-                            Log.e(TAG, "loadMusic failed: CANCELED")
-                            musicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.CANCELED)
-                            return@loadLyric
-                        }
-
-                        if (lyricUrl == null) {
-                            // 加载歌词失败
-                            Log.e(TAG, "loadMusic failed: NO_LYRIC_URL")
-                            musicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.NO_LYRIC_URL)
-                        } else {
-                            // 加载歌词成功
-                            Log.d(TAG, "loadMusic success")
-                            lrcView?.onDownloadLrcData(lyricUrl)
-                            musicLoadStateListener.onMusicLoadProgress(song, 100, MusicLoadStatus.COMPLETED, msg, lrcUrl)
-                            musicLoadStateListener.onMusicLoadSuccess(song, lyricUrl)
-                        }
-
-                        if (config.autoPlay) {
-                            // 主唱自动播放歌曲
-                            if (this.singerRole != KTVSingRole.LeadSinger) {
-                                switchSingerRole(KTVSingRole.SoloSinger, null)
-                            }
-                            startSing(song, 0)
-                        }
-                    }
-                } else if (config.mode == KTVLoadMusicMode.LOAD_MUSIC_ONLY) {
-                    // 不需要加载歌词
-                    Log.d(TAG, "loadMusic success")
-                    if (config.autoPlay) {
-                        // 主唱自动播放歌曲
-                        if (this.singerRole != KTVSingRole.LeadSinger) {
-                            switchSingerRole(KTVSingRole.SoloSinger, null)
-                        }
-                        startSing(song, 0)
-                    }
-                    musicLoadStateListener.onMusicLoadProgress(song, 100, MusicLoadStatus.COMPLETED, msg, lrcUrl)
-                    musicLoadStateListener.onMusicLoadSuccess(song, "")
-                }
-            } else if (status == 2) {
-                // 预加载歌曲加载中
-                musicLoadStateListener.onMusicLoadProgress(song, percent, MusicLoadStatus.values().firstOrNull { it.value == status } ?: MusicLoadStatus.FAILED, msg, lrcUrl)
-            } else {
-                // 预加载歌曲失败
-                Log.e(TAG, "loadMusic failed: MUSIC_PRELOAD_FAIL")
-                musicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.MUSIC_PRELOAD_FAIL)
-            }
-        }
-    }
-
     override fun loadMusic(
         url: String,
         config: KTVLoadMusicConfiguration
@@ -507,16 +336,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         startSing(url, curPlayPosition)
     }
 
-    override fun startSing(songCode: Long, startPos: Long) {
-        Log.d(TAG, "playSong called: $singerRole")
-        if (this.songCode != songCode) {
-            Log.e(TAG, "startSing failed: canceled")
-            return
-        }
-        mRtcEngine.adjustPlaybackSignalVolume(remoteVolume)
-        mPlayer.open(songCode, startPos)
-    }
-
     override fun startSing(url: String, startPos: Long) {
         Log.d(TAG, "playSong called: $singerRole")
         if (this.songUrl != url || this.songUrl2 != url) {
@@ -560,10 +379,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         return mPlayer
     }
 
-    override fun getMusicContentCenter(): IAgoraMusicContentCenter {
-        return mMusicCenter
-    }
-
     // ------------------ inner KTVApi --------------------
     private fun becomeSoloSinger() {
         Log.d(TAG, "becomeSoloSinger called")
@@ -600,11 +415,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 mRtcEngine.updateChannelMediaOptions(channelMediaOption)
 
                 // 预加载歌曲成功
-                if (songMode == KTVSongMode.SONG_CODE) {
-                    mPlayer.open(songCode, 0) // TODO open failed
-                } else {
-                    mPlayer.open(songUrl, 0) // TODO open failed
-                }
+                mPlayer.open(songUrl, 0) // TODO open failed
 
                 // 预加载成功后加入第二频道：预加载时间>>joinChannel时间
                 joinChorus2ndChannel(newRole, token, mainSingerUid) { joinStatus ->
@@ -817,7 +628,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
                 val curTime = System.currentTimeMillis()
                 val offset = curTime - lastReceivedTime
                 if (offset <= 1000) {
-                    val curTs = mReceivedPlayPosition + offset + highStartTime
+                    val curTs = mReceivedPlayPosition + offset
                     runOnMainThread {
                         lrcView?.onUpdatePitch(pitch.toFloat())
                         // (fix ENT-489)Make lyrics delay for 200ms
@@ -887,40 +698,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         if (scheduledThreadPool is ScheduledThreadPoolExecutor) {
             scheduledThreadPool.remove(mSyncPitchTask)
         }
-    }
-
-    private fun loadLyric(songNo: Long, onLoadLyricCallback: (songNo: Long, lyricUrl: String?) -> Unit) {
-        Log.d(TAG, "loadLyric: $songNo")
-        val requestId = mMusicCenter.getLyric(songNo, 0)
-        if (requestId.isEmpty()) {
-            onLoadLyricCallback.invoke(songNo, null)
-            return
-        }
-        lyricSongCodeMap[requestId] = songNo
-        lyricCallbackMap[requestId] = onLoadLyricCallback
-    }
-
-    private fun preLoadMusic(songNo: Long, onLoadMusicCallback: (songCode: Long,
-                                                                 percent: Int,
-                                                                 status: Int,
-                                                                 msg: String?,
-                                                                 lyricUrl: String?) -> Unit) {
-        Log.d(TAG, "loadMusic: $songNo")
-        val ret = mMusicCenter.isPreloaded(songNo)
-        if (ret == 0) {
-            loadMusicCallbackMap.remove(songNo.toString())
-            onLoadMusicCallback(songNo, 100, 0, null, null)
-            return
-        }
-
-        val retPreload = mMusicCenter.preload(songNo, null)
-        if (retPreload != 0) {
-            Log.e(TAG, "preLoadMusic failed: $retPreload")
-            loadMusicCallbackMap.remove(songNo.toString())
-            onLoadMusicCallback(songNo, 100, 1, null, null)
-            return
-        }
-        loadMusicCallbackMap[songNo.toString()] = onLoadMusicCallback
     }
 
     private fun getNtpTimeInMs(): Long {
@@ -1073,92 +850,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         audioPlayoutDelay = audioState.audioPlayoutDelay
     }
 
-    // ------------------------ AgoraMusicContentCenterEventDelegate  ------------------------
-    override fun onPreLoadEvent(
-        requestId: String?,
-        songCode: Long,
-        percent: Int,
-        lyricUrl: String?,
-        status: Int,
-        errorCode: Int
-    ) {
-        val callback = loadMusicCallbackMap[songCode.toString()] ?: return
-        if (status == 0 || status == 1) {
-            loadMusicCallbackMap.remove(songCode.toString())
-        }
-        if (errorCode == 2) {
-            // Token过期
-            ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
-        }
-        callback.invoke(songCode, percent, status, RtcEngine.getErrorDescription(errorCode), lyricUrl)
-    }
-
-    override fun onMusicCollectionResult(
-        requestId: String?,
-        page: Int,
-        pageSize: Int,
-        total: Int,
-        list: Array<out Music>?,
-        errorCode: Int
-    ) {
-        val id = requestId ?: return
-        val callback = musicCollectionCallbackMap[id] ?: return
-        musicCollectionCallbackMap.remove(id)
-        if (errorCode == 2) {
-            // Token过期
-            ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
-        }
-        callback.invoke(requestId, errorCode, page, pageSize, total, list)
-    }
-
-    override fun onMusicChartsResult(requestId: String?, list: Array<out MusicChartInfo>?, errorCode: Int) {
-        val id = requestId ?: return
-        val callback = musicChartsCallbackMap[id] ?: return
-        musicChartsCallbackMap.remove(id)
-        if (errorCode == 2) {
-            // Token过期
-            ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
-        }
-        callback.invoke(requestId, errorCode, list)
-    }
-
-    override fun onLyricResult(
-        requestId: String?,
-        songCode: Long,
-        lyricUrl: String?,
-        errorCode: Int
-    ) {
-        val callback = lyricCallbackMap[requestId] ?: return
-        val songCode = lyricSongCodeMap[requestId] ?: return
-        lyricCallbackMap.remove(lyricUrl)
-        if (errorCode == 2) {
-            // Token过期
-            ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
-        }
-        if (lyricUrl == null || lyricUrl.isEmpty()) {
-            callback(songCode, null)
-            return
-        }
-        callback(songCode, lyricUrl)
-    }
-
-    private var highStartTime = 0L;
-    override fun onSongSimpleInfoResult(
-        requestId: String?,
-        songCode: Long,
-        simpleInfo: String,
-        errorCode: Int
-    ) {
-        if (this.ktvApiConfig.type == KTVType.Normal) return
-        val jsonMsg = JSONObject(simpleInfo)
-        val format = jsonMsg.getJSONObject("format")
-        val highPart = format.getJSONArray("highPart")
-        val highStartTime = JSONObject(highPart[0].toString())
-        val time = highStartTime.getLong("highStartTime")
-        val endTime = highStartTime.getLong("highEndTime")
-        this.highStartTime = time
-        lrcView?.onHighPartTime(time, endTime)
-    }
 
     // ------------------------ AgoraRtcMediaPlayerDelegate ------------------------
     private var duration: Long = 0

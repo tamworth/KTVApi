@@ -259,86 +259,7 @@ interface KTVApi {
      * @param rtmToken musicContentCenter模块需要的rtm token
      * @param chorusChannelRtcToken 合唱需要的频道rtc token
      */
-    fun renewToken(
-        rtmToken: String,
-        chorusChannelRtcToken: String
-    )
-
-    /**
-     * 获取歌曲榜单
-     * @param onMusicChartResultListener 榜单列表回调
-     */
-    fun fetchMusicCharts(
-        onMusicChartResultListener: (
-            requestId: String?, // TODO 不需要？
-            status: Int,        // status=2 时token过期
-            list: Array<out MusicChartInfo>?
-        ) -> Unit
-    )
-
-    /**
-     * 根据歌曲榜单类型获取歌单
-     * @param musicChartId 榜单id
-     * @param page 歌曲列表回调
-     * @param pageSize 歌曲列表回调
-     * @param jsonOption 自定义过滤模式
-     * @param onMusicCollectionResultListener 歌曲列表回调
-     */
-    fun searchMusicByMusicChartId(
-        musicChartId: Int,
-        page: Int,
-        pageSize: Int,
-        jsonOption: String,
-        onMusicCollectionResultListener: (
-            requestId: String?,  // TODO 不需要？
-            status: Int,         // status=2 时token过期
-            page: Int,
-            pageSize: Int,
-            total: Int,
-            list: Array<out Music>?
-        ) -> Unit
-    )
-
-    /**
-     * 根据关键字搜索歌曲
-     * @param keyword 关键字
-     * @param page 歌曲列表回调
-     * @param jsonOption 自定义过滤模式
-     * @param onMusicCollectionResultListener 歌曲列表回调
-     */
-    fun searchMusicByKeyword(
-        keyword: String,
-        page: Int, pageSize: Int,
-        jsonOption: String,
-        onMusicCollectionResultListener: (
-            requestId: String?,  // TODO 不需要？
-            status: Int,         // status=2 时token过期
-            page: Int,
-            pageSize: Int,
-            total: Int,
-            list: Array<out Music>?
-        ) -> Unit
-    )
-
-    /**
-     * 异步加载歌曲，同时只能为一首歌loadSong，loadSong结果会通过回调通知业务层
-     * @param songCode 歌曲唯一编码
-     * @param config 加载歌曲配置
-     * @param musicLoadStateListener 加载歌曲结果回调
-     *
-     * 推荐调用：
-     * 歌曲开始时：
-     * 主唱 loadMusic(KTVLoadMusicConfiguration(autoPlay=true, mode=LOAD_MUSIC_AND_LRC, songCode, mainSingerUid)) switchSingerRole(SoloSinger)
-     * 观众 loadMusic(KTVLoadMusicConfiguration(autoPlay=false, mode=LOAD_LRC_ONLY, songCode, mainSingerUid))
-     * 加入合唱时：
-     * 准备加入合唱者：loadMusic(KTVLoadMusicConfiguration(autoPlay=false, mode=LOAD_MUSIC_ONLY, songCode, mainSingerUid))
-     * loadMusic成功后switchSingerRole(CoSinger)
-     */
-    fun loadMusic(
-        songCode: Long,
-        config: KTVLoadMusicConfiguration,
-        musicLoadStateListener: IMusicLoadStateListener
-    )
+    fun renewToken(chorusChannelRtcToken: String)
 
     /**
      * 加载歌曲，同时只能为一首歌loadSong，同步调用， 一般使用此loadSong是歌曲已经preload成功（url为本地文件地址）
@@ -408,16 +329,6 @@ interface KTVApi {
 
     /**
      * 播放歌曲
-     * @param songCode 歌曲唯一编码
-     * @param startPos 开始播放的位置
-     * 对于主唱：
-     * 如果loadMusic时你选择了autoPlay = true 则不需要主动调用startSing
-     * 如果loadMusic时你选择了autoPlay = false 则需要在loadMusic成功后调用startSing
-     */
-    fun startSing(songCode: Long, startPos: Long)
-
-    /**
-     * 播放歌曲
      * @param url 歌曲地址
      * @param startPos 开始播放的位置
      * 对于主唱：
@@ -463,9 +374,4 @@ interface KTVApi {
      * 获取mpk实例
      */
     fun getMediaPlayer() : IMediaPlayer
-
-    /**
-     * 获取mcc实例
-     */
-    fun getMusicContentCenter() : IAgoraMusicContentCenter
 }
