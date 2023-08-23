@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/navigation_main">
+
+    <fragment
+        android:id="@+id/navigation_main"
+        android:name="io.agora.ktvdemo.ui.MainFragment"
+        android:label="首页"
+        tools:layout="@layout/fragment_main" >
+
+        <action
+            android:id="@+id/action_mainFragment_to_livingFragment"
+            app:destination="@id/navigation_living" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_living"
+        android:name="io.agora.ktvdemo.ui.LivingFragment"
+        android:label=""
+        tools:layout="@layout/fragment_living" >
+
+        <action
+            android:id="@+id/action_livingFragment_to_homeFragment"
+            app:destination="@id/navigation_main" />
+    </fragment>
+</navigation>

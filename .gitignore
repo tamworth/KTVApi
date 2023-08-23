@@ -1,0 +1,12 @@
+**/android/.gradle
+.DS_Store
+local.properties
+.idea
+**/AgoraLyricsScore/*
+Pods
+**/*.xcworkspace/**
+**/xcuserdata
+**/*.lic
+**/libs/*
+**/buglyqq-upload-symbol/**
+**/build.sh

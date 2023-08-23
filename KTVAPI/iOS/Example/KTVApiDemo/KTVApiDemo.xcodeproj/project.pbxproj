@@ -1,0 +1,509 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E3ED270B2A822E9D0087B7AA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED270A2A822E9D0087B7AA /* AppDelegate.swift */; };
+		E3ED270D2A822E9D0087B7AA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED270C2A822E9D0087B7AA /* SceneDelegate.swift */; };
+		E3ED270F2A822E9D0087B7AA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED270E2A822E9D0087B7AA /* ViewController.swift */; };
+		E3ED27122A822E9D0087B7AA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E3ED27102A822E9D0087B7AA /* Main.storyboard */; };
+		E3ED27142A822E9E0087B7AA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E3ED27132A822E9E0087B7AA /* Assets.xcassets */; };
+		E3ED27172A822E9E0087B7AA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E3ED27152A822E9E0087B7AA /* LaunchScreen.storyboard */; };
+		E3ED27212A822ED30087B7AA /* KTVApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED271F2A822ED30087B7AA /* KTVApiImpl.swift */; };
+		E3ED27222A822ED30087B7AA /* KTVApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED27202A822ED30087B7AA /* KTVApi.swift */; };
+		E3ED27242A8230A00087B7AA /* KeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED27232A8230A00087B7AA /* KeyCenter.swift */; };
+		E3ED27262A8236750087B7AA /* KTVViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED27252A8236750087B7AA /* KTVViewController.swift */; };
+		E3ED27282A8243480087B7AA /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED27272A8243480087B7AA /* NetworkManager.swift */; };
+		E3ED272A2A826B0D0087B7AA /* KTVLyricView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED27292A826B0D0087B7AA /* KTVLyricView.swift */; };
+		E3ED27342A8312120087B7AA /* AgoraMiguXmlLrcParse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED272C2A8312120087B7AA /* AgoraMiguXmlLrcParse.swift */; };
+		E3ED27352A8312120087B7AA /* AgoraLrcParse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED272D2A8312120087B7AA /* AgoraLrcParse.swift */; };
+		E3ED27362A8312120087B7AA /* AgoraRequestTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED272E2A8312120087B7AA /* AgoraRequestTask.swift */; };
+		E3ED27372A8312120087B7AA /* AgoraLrcModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED272F2A8312120087B7AA /* AgoraLrcModel.swift */; };
+		E3ED27382A8312120087B7AA /* AgoraCacheFileHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED27302A8312120087B7AA /* AgoraCacheFileHandle.swift */; };
+		E3ED27392A8312120087B7AA /* AgoraStringExtention.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED27312A8312120087B7AA /* AgoraStringExtention.swift */; };
+		E3ED273A2A8312120087B7AA /* AgoraURLExtention.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED27322A8312120087B7AA /* AgoraURLExtention.swift */; };
+		E3ED273B2A8312120087B7AA /* AgoraDownLoadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED27332A8312120087B7AA /* AgoraDownLoadManager.swift */; };
+		F33427D772BC45C43FBC8F23 /* Pods_KTVApiDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AFBE8E6CA2314F17EF33468 /* Pods_KTVApiDemo.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0AFBE8E6CA2314F17EF33468 /* Pods_KTVApiDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KTVApiDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		91649F2302F7D5A73F303630 /* Pods-KTVApiDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KTVApiDemo.release.xcconfig"; path = "Target Support Files/Pods-KTVApiDemo/Pods-KTVApiDemo.release.xcconfig"; sourceTree = "<group>"; };
+		AFA8596CCA93FAF74AD1D2D5 /* Pods-KTVApiDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KTVApiDemo.debug.xcconfig"; path = "Target Support Files/Pods-KTVApiDemo/Pods-KTVApiDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		E3ED27072A822E9D0087B7AA /* KTVApiDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KTVApiDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E3ED270A2A822E9D0087B7AA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		E3ED270C2A822E9D0087B7AA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		E3ED270E2A822E9D0087B7AA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		E3ED27112A822E9D0087B7AA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		E3ED27132A822E9E0087B7AA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E3ED27162A822E9E0087B7AA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		E3ED27182A822E9E0087B7AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E3ED271F2A822ED30087B7AA /* KTVApiImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApiImpl.swift; sourceTree = "<group>"; };
+		E3ED27202A822ED30087B7AA /* KTVApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVApi.swift; sourceTree = "<group>"; };
+		E3ED27232A8230A00087B7AA /* KeyCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyCenter.swift; sourceTree = "<group>"; };
+		E3ED27252A8236750087B7AA /* KTVViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KTVViewController.swift; sourceTree = "<group>"; };
+		E3ED27272A8243480087B7AA /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		E3ED27292A826B0D0087B7AA /* KTVLyricView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KTVLyricView.swift; sourceTree = "<group>"; };
+		E3ED272C2A8312120087B7AA /* AgoraMiguXmlLrcParse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraMiguXmlLrcParse.swift; sourceTree = "<group>"; };
+		E3ED272D2A8312120087B7AA /* AgoraLrcParse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraLrcParse.swift; sourceTree = "<group>"; };
+		E3ED272E2A8312120087B7AA /* AgoraRequestTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraRequestTask.swift; sourceTree = "<group>"; };
+		E3ED272F2A8312120087B7AA /* AgoraLrcModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraLrcModel.swift; sourceTree = "<group>"; };
+		E3ED27302A8312120087B7AA /* AgoraCacheFileHandle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraCacheFileHandle.swift; sourceTree = "<group>"; };
+		E3ED27312A8312120087B7AA /* AgoraStringExtention.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraStringExtention.swift; sourceTree = "<group>"; };
+		E3ED27322A8312120087B7AA /* AgoraURLExtention.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraURLExtention.swift; sourceTree = "<group>"; };
+		E3ED27332A8312120087B7AA /* AgoraDownLoadManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraDownLoadManager.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E3ED27042A822E9D0087B7AA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F33427D772BC45C43FBC8F23 /* Pods_KTVApiDemo.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4E37014520EB391E6411ED65 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				AFA8596CCA93FAF74AD1D2D5 /* Pods-KTVApiDemo.debug.xcconfig */,
+				91649F2302F7D5A73F303630 /* Pods-KTVApiDemo.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		76CCE8A21EADE0F2B8001593 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0AFBE8E6CA2314F17EF33468 /* Pods_KTVApiDemo.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E3ED26FE2A822E9D0087B7AA = {
+			isa = PBXGroup;
+			children = (
+				E3ED27092A822E9D0087B7AA /* KTVApiDemo */,
+				E3ED27082A822E9D0087B7AA /* Products */,
+				4E37014520EB391E6411ED65 /* Pods */,
+				76CCE8A21EADE0F2B8001593 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		E3ED27082A822E9D0087B7AA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E3ED27072A822E9D0087B7AA /* KTVApiDemo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E3ED27092A822E9D0087B7AA /* KTVApiDemo */ = {
+			isa = PBXGroup;
+			children = (
+				E3ED27232A8230A00087B7AA /* KeyCenter.swift */,
+				E3ED270A2A822E9D0087B7AA /* AppDelegate.swift */,
+				E3ED270C2A822E9D0087B7AA /* SceneDelegate.swift */,
+				E3ED270E2A822E9D0087B7AA /* ViewController.swift */,
+				E3ED27252A8236750087B7AA /* KTVViewController.swift */,
+				E3ED27292A826B0D0087B7AA /* KTVLyricView.swift */,
+				E3ED272B2A8312120087B7AA /* FileDownloadCache */,
+				E3ED27272A8243480087B7AA /* NetworkManager.swift */,
+				E3ED271E2A822ED30087B7AA /* KTVAPI */,
+				E3ED27102A822E9D0087B7AA /* Main.storyboard */,
+				E3ED27132A822E9E0087B7AA /* Assets.xcassets */,
+				E3ED27152A822E9E0087B7AA /* LaunchScreen.storyboard */,
+				E3ED27182A822E9E0087B7AA /* Info.plist */,
+			);
+			path = KTVApiDemo;
+			sourceTree = "<group>";
+		};
+		E3ED271E2A822ED30087B7AA /* KTVAPI */ = {
+			isa = PBXGroup;
+			children = (
+				E3ED271F2A822ED30087B7AA /* KTVApiImpl.swift */,
+				E3ED27202A822ED30087B7AA /* KTVApi.swift */,
+			);
+			path = KTVAPI;
+			sourceTree = "<group>";
+		};
+		E3ED272B2A8312120087B7AA /* FileDownloadCache */ = {
+			isa = PBXGroup;
+			children = (
+				E3ED272C2A8312120087B7AA /* AgoraMiguXmlLrcParse.swift */,
+				E3ED272D2A8312120087B7AA /* AgoraLrcParse.swift */,
+				E3ED272E2A8312120087B7AA /* AgoraRequestTask.swift */,
+				E3ED272F2A8312120087B7AA /* AgoraLrcModel.swift */,
+				E3ED27302A8312120087B7AA /* AgoraCacheFileHandle.swift */,
+				E3ED27312A8312120087B7AA /* AgoraStringExtention.swift */,
+				E3ED27322A8312120087B7AA /* AgoraURLExtention.swift */,
+				E3ED27332A8312120087B7AA /* AgoraDownLoadManager.swift */,
+			);
+			path = FileDownloadCache;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E3ED27062A822E9D0087B7AA /* KTVApiDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E3ED271B2A822E9E0087B7AA /* Build configuration list for PBXNativeTarget "KTVApiDemo" */;
+			buildPhases = (
+				6204921198ECC9EB504AF427 /* [CP] Check Pods Manifest.lock */,
+				E3ED27032A822E9D0087B7AA /* Sources */,
+				E3ED27042A822E9D0087B7AA /* Frameworks */,
+				E3ED27052A822E9D0087B7AA /* Resources */,
+				16B2E5E2D8F04BEB3E9FEE4F /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KTVApiDemo;
+			productName = KTVApiDemo;
+			productReference = E3ED27072A822E9D0087B7AA /* KTVApiDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E3ED26FF2A822E9D0087B7AA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1420;
+				LastUpgradeCheck = 1420;
+				TargetAttributes = {
+					E3ED27062A822E9D0087B7AA = {
+						CreatedOnToolsVersion = 14.2;
+					};
+				};
+			};
+			buildConfigurationList = E3ED27022A822E9D0087B7AA /* Build configuration list for PBXProject "KTVApiDemo" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E3ED26FE2A822E9D0087B7AA;
+			productRefGroup = E3ED27082A822E9D0087B7AA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E3ED27062A822E9D0087B7AA /* KTVApiDemo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E3ED27052A822E9D0087B7AA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E3ED27172A822E9E0087B7AA /* LaunchScreen.storyboard in Resources */,
+				E3ED27142A822E9E0087B7AA /* Assets.xcassets in Resources */,
+				E3ED27122A822E9D0087B7AA /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		16B2E5E2D8F04BEB3E9FEE4F /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-KTVApiDemo/Pods-KTVApiDemo-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-KTVApiDemo/Pods-KTVApiDemo-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-KTVApiDemo/Pods-KTVApiDemo-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6204921198ECC9EB504AF427 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-KTVApiDemo-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E3ED27032A822E9D0087B7AA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E3ED27392A8312120087B7AA /* AgoraStringExtention.swift in Sources */,
+				E3ED273B2A8312120087B7AA /* AgoraDownLoadManager.swift in Sources */,
+				E3ED27212A822ED30087B7AA /* KTVApiImpl.swift in Sources */,
+				E3ED27222A822ED30087B7AA /* KTVApi.swift in Sources */,
+				E3ED270F2A822E9D0087B7AA /* ViewController.swift in Sources */,
+				E3ED270B2A822E9D0087B7AA /* AppDelegate.swift in Sources */,
+				E3ED27342A8312120087B7AA /* AgoraMiguXmlLrcParse.swift in Sources */,
+				E3ED27282A8243480087B7AA /* NetworkManager.swift in Sources */,
+				E3ED27242A8230A00087B7AA /* KeyCenter.swift in Sources */,
+				E3ED27382A8312120087B7AA /* AgoraCacheFileHandle.swift in Sources */,
+				E3ED272A2A826B0D0087B7AA /* KTVLyricView.swift in Sources */,
+				E3ED270D2A822E9D0087B7AA /* SceneDelegate.swift in Sources */,
+				E3ED27262A8236750087B7AA /* KTVViewController.swift in Sources */,
+				E3ED27352A8312120087B7AA /* AgoraLrcParse.swift in Sources */,
+				E3ED273A2A8312120087B7AA /* AgoraURLExtention.swift in Sources */,
+				E3ED27372A8312120087B7AA /* AgoraLrcModel.swift in Sources */,
+				E3ED27362A8312120087B7AA /* AgoraRequestTask.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		E3ED27102A822E9D0087B7AA /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E3ED27112A822E9D0087B7AA /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		E3ED27152A822E9E0087B7AA /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E3ED27162A822E9E0087B7AA /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		E3ED27192A822E9E0087B7AA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		E3ED271A2A822E9E0087B7AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E3ED271C2A822E9E0087B7AA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AFA8596CCA93FAF74AD1D2D5 /* Pods-KTVApiDemo.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KR58Y29Q42;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KTVApiDemo/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "KTVApiDemo申请使用麦克风权限进行K歌";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.agora.www.KTVApiDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E3ED271D2A822E9E0087B7AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 91649F2302F7D5A73F303630 /* Pods-KTVApiDemo.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KR58Y29Q42;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KTVApiDemo/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "KTVApiDemo申请使用麦克风权限进行K歌";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.agora.www.KTVApiDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E3ED27022A822E9D0087B7AA /* Build configuration list for PBXProject "KTVApiDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E3ED27192A822E9E0087B7AA /* Debug */,
+				E3ED271A2A822E9E0087B7AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E3ED271B2A822E9E0087B7AA /* Build configuration list for PBXNativeTarget "KTVApiDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E3ED271C2A822E9E0087B7AA /* Debug */,
+				E3ED271D2A822E9E0087B7AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E3ED26FF2A822E9D0087B7AA /* Project object */;
+}
