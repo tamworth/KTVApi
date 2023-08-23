@@ -8,25 +8,11 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import io.agora.karaoke_view.v11.KaraokeView
 import io.agora.ktvdemo.BuildConfig
-import io.agora.ktvdemo.IChannelEventListener
 import io.agora.ktvdemo.RtcEngineController
 import io.agora.ktvdemo.databinding.FragmentLivingBinding
-import io.agora.ktvdemo.ktvapi.IKTVApiEventHandler
-import io.agora.ktvdemo.ktvapi.ILrcView
-import io.agora.ktvdemo.ktvapi.IMusicLoadStateListener
-import io.agora.ktvdemo.ktvapi.ISwitchRoleStateListener
-import io.agora.ktvdemo.ktvapi.KTVApi
-import io.agora.ktvdemo.ktvapi.KTVApiConfig
-import io.agora.ktvdemo.ktvapi.KTVLoadMusicConfiguration
-import io.agora.ktvdemo.ktvapi.KTVLoadMusicMode
-import io.agora.ktvdemo.ktvapi.KTVLoadSongFailReason
-import io.agora.ktvdemo.ktvapi.KTVSingRole
-import io.agora.ktvdemo.ktvapi.MusicLoadStatus
-import io.agora.ktvdemo.ktvapi.SwitchRoleFailReason
-import io.agora.ktvdemo.ktvapi.createKTVApi
+import io.agora.ktvdemo.ktvapi.*
 import io.agora.ktvdemo.utils.DownloadUtils
 import io.agora.ktvdemo.utils.KeyCenter
-import io.agora.ktvdemo.utils.TokenGenerator
 import io.agora.ktvdemo.utils.ZipUtils
 import io.agora.mediaplayer.Constants
 import io.agora.rtc2.ChannelMediaOptions
@@ -95,7 +81,10 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
             KeyCenter.channelId,
             KeyCenter.localUid,
             "${KeyCenter.channelId}_ex",
-            RtcEngineController.chorusChannelRtcToken
+            RtcEngineController.chorusChannelRtcToken,
+            10,
+            KTVType.Normal,
+            if (KeyCenter.isMcc) KTVSongType.SONG_CODE else KTVSongType.SONG_URL
         )
         ktvApi.initialize(ktvApiConfig)
         ktvApi.addEventHandler(ktvApiEventHandler)
@@ -273,7 +262,6 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
         ktvApi.switchSingerRole(KTVSingRole.Audience, null)
         ktvApi.removeEventHandler(ktvApiEventHandler)
         ktvApi.release()
-        RtcEngine.destroy()
         super.onDestroy()
     }
 }
