@@ -88,7 +88,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
             RtcEngineController.chorusChannelRtcToken,
             10,
             KTVType.Normal,
-            if (KeyCenter.isMcc) KTVSongType.SONG_CODE else KTVSongType.SONG_URL
+            if (KeyCenter.isMcc) KTVMusicType.SONG_CODE else KTVMusicType.SONG_URL
         )
         ktvApi.initialize(ktvApiConfig)
         ktvApi.addEventHandler(ktvApiEventHandler)

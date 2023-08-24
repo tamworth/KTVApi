@@ -23,7 +23,7 @@ enum class KTVType(val value: Int)  {
  * @param SONG_CODE mcc版权歌单songCode
  * @param SONG_URL 本地歌曲地址url
  */
-enum class KTVSongType(val value: Int) {
+enum class KTVMusicType(val value: Int) {
     SONG_CODE(0),
     SONG_URL(1)
 }
@@ -208,6 +208,7 @@ abstract class IKTVApiEventHandler {
  * @param chorusChannelToken 子频道token 加入子频道需要用到
  * @param maxCacheSize 最大缓存歌曲数
  * @param type KTV场景
+ * @param musicType 音乐类型，默认为mcc曲库
  */
 data class KTVApiConfig constructor(
     val appId: String,
@@ -219,7 +220,7 @@ data class KTVApiConfig constructor(
     val chorusChannelToken: String,
     val maxCacheSize: Int = 10,
     val type: KTVType = KTVType.Normal,
-    val musicType: KTVSongType = KTVSongType.SONG_CODE
+    val musicType: KTVMusicType = KTVMusicType.SONG_CODE
 )
 
 /**
@@ -237,7 +238,7 @@ data class KTVLoadMusicConfiguration(
 )
 
 /**
- * 获取 KTVApi 实例
+ * 创建 KTVApi 实例
  */
 fun createKTVApi(): KTVApi = KTVApiImpl()
 
