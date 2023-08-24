@@ -4,17 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
-import io.agora.ktvdemo.IChannelEventListener
+import io.agora.ktvdemo.rtc.IChannelEventListener
 import io.agora.ktvdemo.R
-import io.agora.ktvdemo.RtcEngineController
+import io.agora.ktvdemo.rtc.RtcEngineController
 import io.agora.ktvdemo.databinding.FragmentMainBinding
 import io.agora.ktvdemo.utils.KeyCenter
 import io.agora.ktvdemo.utils.TokenGenerator
-import io.agora.rtc2.ChannelMediaOptions
 
 class MainFragment : BaseFragment<FragmentMainBinding>() {
 

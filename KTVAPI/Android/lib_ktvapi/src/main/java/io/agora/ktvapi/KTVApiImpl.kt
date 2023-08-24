@@ -1,4 +1,4 @@
-package io.agora.ktvdemo.ktvapi
+package io.agora.ktvapi
 
 import android.os.Handler
 import android.os.Looper

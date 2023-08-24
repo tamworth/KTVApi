@@ -8,29 +8,27 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import io.agora.karaoke_view.v11.KaraokeView
 import io.agora.ktvdemo.BuildConfig
-import io.agora.ktvdemo.IChannelEventListener
-import io.agora.ktvdemo.RtcEngineController
+import io.agora.ktvdemo.rtc.RtcEngineController
 import io.agora.ktvdemo.databinding.FragmentLivingBinding
-import io.agora.ktvdemo.ktvapi.IKTVApiEventHandler
-import io.agora.ktvdemo.ktvapi.ILrcView
-import io.agora.ktvdemo.ktvapi.IMusicLoadStateListener
-import io.agora.ktvdemo.ktvapi.ISwitchRoleStateListener
-import io.agora.ktvdemo.ktvapi.KTVApi
-import io.agora.ktvdemo.ktvapi.KTVApiConfig
-import io.agora.ktvdemo.ktvapi.KTVLoadMusicConfiguration
-import io.agora.ktvdemo.ktvapi.KTVLoadMusicMode
-import io.agora.ktvdemo.ktvapi.KTVLoadSongFailReason
-import io.agora.ktvdemo.ktvapi.KTVSingRole
-import io.agora.ktvdemo.ktvapi.MusicLoadStatus
-import io.agora.ktvdemo.ktvapi.SwitchRoleFailReason
-import io.agora.ktvdemo.ktvapi.createKTVApi
+import io.agora.ktvapi.IKTVApiEventHandler
+import io.agora.ktvapi.ILrcView
+import io.agora.ktvapi.IMusicLoadStateListener
+import io.agora.ktvapi.ISwitchRoleStateListener
+import io.agora.ktvapi.KTVApi
+import io.agora.ktvapi.KTVApiConfig
+import io.agora.ktvapi.KTVLoadMusicConfiguration
+import io.agora.ktvapi.KTVLoadMusicMode
+import io.agora.ktvapi.KTVLoadSongFailReason
+import io.agora.ktvapi.KTVSingRole
+import io.agora.ktvapi.MusicLoadStatus
+import io.agora.ktvapi.SwitchRoleFailReason
+import io.agora.ktvapi.createKTVApi
+import io.agora.ktvdemo.R
 import io.agora.ktvdemo.utils.DownloadUtils
 import io.agora.ktvdemo.utils.KeyCenter
-import io.agora.ktvdemo.utils.TokenGenerator
 import io.agora.ktvdemo.utils.ZipUtils
 import io.agora.mediaplayer.Constants
 import io.agora.rtc2.ChannelMediaOptions
-import io.agora.rtc2.RtcEngine
 import java.io.File
 
 class LivingFragment : BaseFragment<FragmentLivingBinding>() {
@@ -40,6 +38,8 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
     private val ktvApi: KTVApi by lazy {
         createKTVApi()
     }
+
+    private val ktvApiEventHandler = object : IKTVApiEventHandler() {}
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentLivingBinding {
         return FragmentLivingBinding.inflate(inflater)
@@ -53,18 +53,30 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
         joinChannel()
     }
 
+    override fun onDestroy() {
+        ktvApi.switchSingerRole(KTVSingRole.Audience, null)
+        ktvApi.removeEventHandler(ktvApiEventHandler)
+        ktvApi.release()
+        RtcEngineController.rtcEngine.leaveChannel()
+        super.onDestroy()
+    }
+
     private fun initView() {
         binding?.apply {
             karaokeView = KaraokeView(lyricsView,null)
             btnClose.setOnClickListener {
+                ktvApi.switchSingerRole(KTVSingRole.Audience, null)
+                ktvApi.removeEventHandler(ktvApiEventHandler)
+                ktvApi.release()
+                RtcEngineController.rtcEngine.leaveChannel()
                 findNavController().popBackStack()
             }
             if (KeyCenter.isLeadSinger()) {
-                tvSinger.text = "主唱"
+                tvSinger.text = getString(R.string.app_lead_singer)
             } else if (KeyCenter.isCoSinger()) {
-                tvSinger.text = "伴唱"
+                tvSinger.text = getString(R.string.app_co_singer)
             } else {
-                tvSinger.text = "观众"
+                tvSinger.text = getString(R.string.app_audience)
             }
         }
     }
@@ -248,32 +260,5 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                 toast("download lrc  ${exception?.message}")
             }
         })
-    }
-
-    private val ktvApiEventHandler = object : IKTVApiEventHandler() {
-        override fun onMusicPlayerStateChanged(
-            state: Constants.MediaPlayerState,
-            error: Constants.MediaPlayerError,
-            isLocal: Boolean
-        ) {
-            super.onMusicPlayerStateChanged(state, error, isLocal)
-        }
-
-        override fun onSingerRoleChanged(oldRole: KTVSingRole, newRole: KTVSingRole) {
-            super.onSingerRoleChanged(oldRole, newRole)
-        }
-
-        override fun onTokenPrivilegeWillExpire() {
-            super.onTokenPrivilegeWillExpire()
-
-        }
-    }
-
-    override fun onDestroy() {
-        ktvApi.switchSingerRole(KTVSingRole.Audience, null)
-        ktvApi.removeEventHandler(ktvApiEventHandler)
-        ktvApi.release()
-        RtcEngine.destroy()
-        super.onDestroy()
     }
 }

@@ -1,6 +1,8 @@
-package io.agora.ktvdemo
+package io.agora.ktvdemo.rtc
 
 import android.util.Log
+import io.agora.ktvdemo.BuildConfig
+import io.agora.ktvdemo.MyApplication
 import io.agora.rtc2.*
 
 data class IChannelEventListener constructor(

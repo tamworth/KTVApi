@@ -1,4 +1,4 @@
-package io.agora.ktvdemo.ktvapi
+package io.agora.ktvapi
 
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayer
