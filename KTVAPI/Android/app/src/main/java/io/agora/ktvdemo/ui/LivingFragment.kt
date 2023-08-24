@@ -43,6 +43,10 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
         binding?.apply {
             karaokeView = KaraokeView(lyricsView,null)
             btnClose.setOnClickListener {
+                ktvApi.switchSingerRole(KTVSingRole.Audience, null)
+                ktvApi.removeEventHandler(ktvApiEventHandler)
+                RtcEngineController.rtcEngine.leaveChannel()
+                ktvApi.release()
                 findNavController().popBackStack()
             }
             if (KeyCenter.isLeadSinger()) {
@@ -262,6 +266,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
         ktvApi.switchSingerRole(KTVSingRole.Audience, null)
         ktvApi.removeEventHandler(ktvApiEventHandler)
         ktvApi.release()
+        RtcEngineController.rtcEngine.leaveChannel()
         super.onDestroy()
     }
 }
