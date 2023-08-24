@@ -7,16 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import io.agora.karaoke_view.v11.KaraokeView
+import io.agora.ktvapi.*
 import io.agora.ktvdemo.BuildConfig
-import io.agora.ktvdemo.RtcEngineController
+import io.agora.ktvdemo.rtc.RtcEngineController
 import io.agora.ktvdemo.databinding.FragmentLivingBinding
-import io.agora.ktvdemo.ktvapi.*
+import io.agora.ktvdemo.R
 import io.agora.ktvdemo.utils.DownloadUtils
 import io.agora.ktvdemo.utils.KeyCenter
 import io.agora.ktvdemo.utils.ZipUtils
-import io.agora.mediaplayer.Constants
 import io.agora.rtc2.ChannelMediaOptions
-import io.agora.rtc2.RtcEngine
 import java.io.File
 
 class LivingFragment : BaseFragment<FragmentLivingBinding>() {
@@ -26,6 +25,8 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
     private val ktvApi: KTVApi by lazy {
         createKTVApi()
     }
+
+    private val ktvApiEventHandler = object : IKTVApiEventHandler() {}
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentLivingBinding {
         return FragmentLivingBinding.inflate(inflater)
@@ -39,22 +40,30 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
         joinChannel()
     }
 
+    override fun onDestroy() {
+        ktvApi.switchSingerRole(KTVSingRole.Audience, null)
+        ktvApi.removeEventHandler(ktvApiEventHandler)
+        ktvApi.release()
+        RtcEngineController.rtcEngine.leaveChannel()
+        super.onDestroy()
+    }
+
     private fun initView() {
         binding?.apply {
             karaokeView = KaraokeView(lyricsView,null)
             btnClose.setOnClickListener {
                 ktvApi.switchSingerRole(KTVSingRole.Audience, null)
                 ktvApi.removeEventHandler(ktvApiEventHandler)
-                RtcEngineController.rtcEngine.leaveChannel()
                 ktvApi.release()
+                RtcEngineController.rtcEngine.leaveChannel()
                 findNavController().popBackStack()
             }
             if (KeyCenter.isLeadSinger()) {
-                tvSinger.text = "主唱"
+                tvSinger.text = getString(R.string.app_lead_singer)
             } else if (KeyCenter.isCoSinger()) {
-                tvSinger.text = "伴唱"
+                tvSinger.text = getString(R.string.app_co_singer)
             } else {
-                tvSinger.text = "观众"
+                tvSinger.text = getString(R.string.app_audience)
             }
         }
     }
@@ -241,32 +250,5 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                 toast("download lrc  ${exception?.message}")
             }
         })
-    }
-
-    private val ktvApiEventHandler = object : IKTVApiEventHandler() {
-        override fun onMusicPlayerStateChanged(
-            state: Constants.MediaPlayerState,
-            error: Constants.MediaPlayerError,
-            isLocal: Boolean
-        ) {
-            super.onMusicPlayerStateChanged(state, error, isLocal)
-        }
-
-        override fun onSingerRoleChanged(oldRole: KTVSingRole, newRole: KTVSingRole) {
-            super.onSingerRoleChanged(oldRole, newRole)
-        }
-
-        override fun onTokenPrivilegeWillExpire() {
-            super.onTokenPrivilegeWillExpire()
-
-        }
-    }
-
-    override fun onDestroy() {
-        ktvApi.switchSingerRole(KTVSingRole.Audience, null)
-        ktvApi.removeEventHandler(ktvApiEventHandler)
-        ktvApi.release()
-        RtcEngineController.rtcEngine.leaveChannel()
-        super.onDestroy()
     }
 }

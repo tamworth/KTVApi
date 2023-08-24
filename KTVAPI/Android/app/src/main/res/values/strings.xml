@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">KtvApiDemo</string>
+    <string name="app_lead_singer">leadSinger</string>
+    <string name="app_co_singer">coSinger</string>
+    <string name="app_audience">audience</string>
 </resources>

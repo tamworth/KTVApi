@@ -4,11 +4,11 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import io.agora.ktvdemo.databinding.ActivityMainBinding
 
-class MainActivity : BaseActivity<ActivityMainBinding>() {
+class MainActivity : AppCompatActivity() {
 
     companion object{
         const val TAG = "MainActivity"
@@ -19,13 +19,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     }
 
-
-    override fun getViewBinding(inflater: LayoutInflater): ActivityMainBinding {
-        return ActivityMainBinding.inflate(inflater)
-    }
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         ActivityCompat.requestPermissions(this, PERMISSIONS, 100)
     }
 
@@ -38,9 +37,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 if (!granted) break
             }
             if (granted) {
-                Log.d(TAG,"获取到权限...")
+                Log.d(TAG,"get premission...")
             } else {
-                Log.d(TAG,"未获取到权限...")
+                Log.d(TAG,"no premission...")
             }
         }
     }

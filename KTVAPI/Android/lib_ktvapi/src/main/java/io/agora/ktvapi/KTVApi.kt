@@ -1,4 +1,4 @@
-package io.agora.ktvdemo.ktvapi
+package io.agora.ktvapi
 
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayer
@@ -208,7 +208,6 @@ abstract class IKTVApiEventHandler {
  * @param chorusChannelToken 子频道token 加入子频道需要用到
  * @param maxCacheSize 最大缓存歌曲数
  * @param type KTV场景
- * @param musicType 音乐类型，默认为mcc曲库
  */
 data class KTVApiConfig constructor(
     val appId: String,
@@ -238,7 +237,7 @@ data class KTVLoadMusicConfiguration(
 )
 
 /**
- * 创建 KTVApi 实例
+ * 获取 KTVApi 实例
  */
 fun createKTVApi(): KTVApi = KTVApiImpl()
 

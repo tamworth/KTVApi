@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KtvApiDemo</string>
+    <string name="app_lead_singer">主唱</string>
+    <string name="app_co_singer">合唱</string>
+    <string name="app_audience">观众</string>
+</resources>
