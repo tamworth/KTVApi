@@ -16,6 +16,8 @@ import io.agora.ktvdemo.utils.DownloadUtils
 import io.agora.ktvdemo.utils.KeyCenter
 import io.agora.ktvdemo.utils.ZipUtils
 import io.agora.rtc2.ChannelMediaOptions
+import io.agora.rtc2.IRtcEngineEventHandler
+import io.agora.rtc2.RtcConnection
 import java.io.File
 
 class LivingFragment : BaseFragment<FragmentLivingBinding>() {
@@ -74,15 +76,57 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
             clientRoleType = if (KeyCenter.isAudience()) io.agora.rtc2.Constants.CLIENT_ROLE_AUDIENCE
             else io.agora.rtc2.Constants.CLIENT_ROLE_BROADCASTER
             autoSubscribeVideo = false
-            autoSubscribeAudio = false
             publishCameraTrack = false
             publishMicrophoneTrack = !KeyCenter.isAudience()
         }
-        RtcEngineController.rtcEngine.joinChannel(
+        RtcEngineController.rtcEngine.joinChannelEx(
             RtcEngineController.rtcToken,
-            KeyCenter.channelId,
-            KeyCenter.localUid,
-            channelMediaOptions
+            RtcConnection(KeyCenter.channelId, KeyCenter.localUid),
+            channelMediaOptions,
+            object : IRtcEngineEventHandler() {
+                override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
+                    super.onJoinChannelSuccess(channel, uid, elapsed)
+                    ktvApi.renewInnerDataStreamId()
+                }
+
+                override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
+                    super.onStreamMessage(uid, streamId, data)
+                    (ktvApi as KTVApiImpl).onStreamMessage(uid, streamId, data)
+                }
+
+                override fun onAudioVolumeIndication(
+                    speakers: Array<out AudioVolumeInfo>?,
+                    totalVolume: Int
+                ) {
+                    super.onAudioVolumeIndication(speakers, totalVolume)
+                    (ktvApi as KTVApiImpl).onAudioVolumeIndication(speakers, totalVolume)
+                }
+
+                override fun onLocalAudioStats(stats: LocalAudioStats?) {
+                    super.onLocalAudioStats(stats)
+                    (ktvApi as KTVApiImpl).onLocalAudioStats(stats)
+                }
+
+                override fun onAudioRouteChanged(routing: Int) {
+                    super.onAudioRouteChanged(routing)
+                    (ktvApi as KTVApiImpl).onAudioRouteChanged(routing)
+                }
+
+                override fun onAudioPublishStateChanged(
+                    channel: String?,
+                    oldState: Int,
+                    newState: Int,
+                    elapseSinceLastState: Int
+                ) {
+                    super.onAudioPublishStateChanged(
+                        channel,
+                        oldState,
+                        newState,
+                        elapseSinceLastState
+                    )
+                    (ktvApi as KTVApiImpl).onAudioPublishStateChanged(channel, oldState, newState, elapseSinceLastState)
+                }
+            }
         )
     }
 
