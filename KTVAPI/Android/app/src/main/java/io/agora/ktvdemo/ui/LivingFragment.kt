@@ -83,6 +83,55 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
             } else {
                 tvSinger.text = getString(R.string.app_audience)
             }
+
+            btnJoinChorus.setOnClickListener {
+                RtcEngineController.rtcEngine.leaveChannelEx(RtcConnection(KeyCenter.channelId + "_ad", KeyCenter.localUid))
+                val musicConfiguration = KTVLoadMusicConfiguration(
+                    KeyCenter.songCode.toString(), false, KeyCenter.LeadSingerUid, KTVLoadMusicMode.LOAD_MUSIC_ONLY
+                )
+                ktvApi.loadMusic(KeyCenter.songCode, musicConfiguration, object : IMusicLoadStateListener {
+                    override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
+                        val channelMediaOptions = ChannelMediaOptions().apply {
+                            autoSubscribeAudio = true
+                            clientRoleType = io.agora.rtc2.Constants.CLIENT_ROLE_BROADCASTER
+                            autoSubscribeVideo = false
+                            publishCameraTrack = false
+                            publishMicrophoneTrack = true
+                        }
+
+                        ktvApi.switchSingerRole(KTVSingRole.CoSinger,
+                            CantataConfiguration(RtcEngineController.rtcToken, channelMediaOptions, 9528, RtcEngineController.chorusChannelRtcToken),
+                            object : ISwitchRoleStateListener {
+                                override fun onSwitchRoleSuccess() {
+
+                                }
+
+                                override fun onSwitchRoleFail(reason: SwitchRoleFailReason) {
+
+                                }
+                            })
+                    }
+
+                    override fun onMusicLoadFail(songCode: Long, reason: KTVLoadSongFailReason) {
+
+                    }
+
+                    override fun onMusicLoadProgress(
+                        songCode: Long,
+                        percent: Int,
+                        status: MusicLoadStatus,
+                        msg: String?,
+                        lyricUrl: String?
+                    ) {
+
+                    }
+                })
+            }
+
+            btnLeaveChorus.setOnClickListener {
+                ktvApi.switchSingerRole(KTVSingRole.Audience, null, null)
+                joinChannel()
+            }
         }
     }
 

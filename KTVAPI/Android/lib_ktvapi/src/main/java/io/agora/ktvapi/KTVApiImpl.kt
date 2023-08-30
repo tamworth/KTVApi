@@ -405,7 +405,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     override fun switchSingerRole(
         newRole: KTVSingRole,
-        config: CantataConfiguration,
+        config: CantataConfiguration?,
         switchRoleStateListener: ISwitchRoleStateListener?
     ) {
         reportCallScenarioApi("switchSingerRole", JSONObject().put("newRole", newRole))
@@ -417,13 +417,15 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         val oldRole = singerRole
         if (this.singerRole == KTVSingRole.Audience && newRole == KTVSingRole.LeadSinger) {
             // 1、Audience -》LeadSinger
-            joinChorus(newRole, config)
+            val cantataConfig = config ?: return
+            joinChorus(newRole, cantataConfig)
             singerRole = newRole
             ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }
             switchRoleStateListener?.onSwitchRoleSuccess()
         } else if (this.singerRole == KTVSingRole.Audience && newRole == KTVSingRole.CoSinger) {
             // 2、Audience -》CoSinger
-            joinChorus(newRole, config)
+            val cantataConfig = config ?: return
+            joinChorus(newRole, cantataConfig)
             singerRole = newRole
             switchRoleStateListener?.onSwitchRoleSuccess()
             ktvApiEventHandlerList.forEach { it.onSingerRoleChanged(oldRole, newRole) }

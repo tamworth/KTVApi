@@ -454,7 +454,7 @@ interface KTVApi {
      */
     fun switchSingerRole(
         newRole: KTVSingRole,
-        config: CantataConfiguration,
+        config: CantataConfiguration?,
         switchRoleStateListener: ISwitchRoleStateListener?
     )
 

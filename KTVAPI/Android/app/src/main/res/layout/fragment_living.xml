@@ -8,7 +8,7 @@
     <io.agora.karaoke_view.v11.LyricsView
         android:id="@+id/lyricsView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="500dp"
         android:background="#666666"
         android:padding="10dp"
         app:currentLineHighlightedTextColor="#FF8AB4"
@@ -35,6 +35,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/btnClose"
         tools:text="主唱" />
+
+    <Button
+        android:id="@+id/btnJoinChorus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="加入合唱"
+        app:layout_constraintTop_toBottomOf="@id/lyricsView"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <Button
+        android:id="@+id/btnLeaveChorus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="退出合唱"
+        app:layout_constraintTop_toBottomOf="@id/lyricsView"
+        app:layout_constraintStart_toEndOf="@+id/btnJoinChorus"/>
+
 
     <ImageButton
         android:id="@+id/btnClose"
