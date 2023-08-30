@@ -238,11 +238,12 @@ data class KTVLoadMusicConfiguration(
     val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
 )
 
-data class CantataConfiguration(
+data class CantataConfiguration constructor(
     val singChannelToken: String,
     val singChannelMediaOptions: ChannelMediaOptions,
     val musicStreamUid: Int,
-    val musicChannelToken: String
+    val musicChannelToken: String,
+    val topN: Int = 0
 )
 
 /**
@@ -515,6 +516,8 @@ interface KTVApi {
      * @param score 演唱分数
      */
     fun setSingingScore(score: Int)
+
+    fun setAudienceStreamMessage(uid: Int, streamId: Int, data: ByteArray?)
 
     /**
      * 获取mpk实例

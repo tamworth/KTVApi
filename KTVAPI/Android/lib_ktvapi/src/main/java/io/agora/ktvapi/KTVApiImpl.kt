@@ -153,7 +153,6 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         // 注册回调
         mPlayer.registerPlayerObserver(this)
         mRtcEngine.addHandlerEx(this, singChannelRtcConnection)
-
         setKTVParameters()
         startDisplayLrc()
         startSyncPitch()
@@ -648,6 +647,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         // 导唱
         mPlayer.setPlayerOption("enable_multi_audio_track", 1)
         (mPlayer as IAgoraMusicPlayer).open(songCode, startPos)
+        mPlayer.setLoopCount(-1)
     }
 
     override fun startSing(url: String, startPos: Long) {
@@ -701,6 +701,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
 
     override fun setSingingScore(score: Int) {
         this.singingScore = score
+    }
+
+    override fun setAudienceStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
+        dealWithStreamMessage(uid, streamId, data)
     }
 
     override fun getMediaPlayer(): IMediaPlayer {
@@ -819,8 +823,13 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         Log.d(TAG, "joinChorus: $newRole")
         config.singChannelMediaOptions.autoSubscribeAudio = true
         if (newRole == KTVSingRole.LeadSinger) {
-            // 主唱不参加TopN
+            // TODO 主唱不参加TopN
             config.singChannelMediaOptions.isAudioFilterable = false
+            // TODO 云端topN 是否会影响观众频道 主唱6
+            mRtcEngine.setParameters("{\"che.audio.filter_streams\":6}")
+        } else {
+            // TODO 云端topN 是否会影响观众频道 伴唱5
+            mRtcEngine.setParameters("{\"che.audio.filter_streams\":5}")
         }
         mRtcEngine.joinChannelEx(config.singChannelToken, singChannelRtcConnection, config.singChannelMediaOptions, object :
             IRtcEngineEventHandler() {
@@ -1296,7 +1305,11 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     // ------------------------ AgoraRtcEvent ------------------------
-     override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
+    override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
+        dealWithStreamMessage(uid, streamId, data)
+    }
+
+    private fun dealWithStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
         val jsonMsg: JSONObject
         val messageData = data ?: return
         try {
@@ -1591,6 +1604,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             msg["playerState"] = MediaPlayerState.getValue(this.mediaPlayerState)
             msg["pitch"] = pitch
             msg["songIdentifier"] = songIdentifier
+            msg["forward"] = true
             val jsonMsg = JSONObject(msg)
             sendStreamMessageWithJsonObject(jsonMsg) {}
         }

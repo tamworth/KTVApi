@@ -9,9 +9,10 @@ import androidx.navigation.fragment.findNavController
 import io.agora.karaoke_view.v11.KaraokeView
 import io.agora.ktvapi.*
 import io.agora.ktvdemo.BuildConfig
-import io.agora.ktvdemo.rtc.RtcEngineController
-import io.agora.ktvdemo.databinding.FragmentLivingBinding
 import io.agora.ktvdemo.R
+import io.agora.ktvdemo.api.ApiManager
+import io.agora.ktvdemo.databinding.FragmentLivingBinding
+import io.agora.ktvdemo.rtc.RtcEngineController
 import io.agora.ktvdemo.utils.DownloadUtils
 import io.agora.ktvdemo.utils.KeyCenter
 import io.agora.ktvdemo.utils.ZipUtils
@@ -19,6 +20,7 @@ import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcConnection
 import java.io.File
+import java.util.concurrent.Executors
 
 class LivingFragment : BaseFragment<FragmentLivingBinding>() {
 
@@ -30,6 +32,8 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
 
     private val ktvApiEventHandler = object : IKTVApiEventHandler() {}
 
+    private val scheduledThreadPool = Executors.newScheduledThreadPool(5)
+
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentLivingBinding {
         return FragmentLivingBinding.inflate(inflater)
     }
@@ -38,11 +42,23 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         initView()
+        if (KeyCenter.isAudience()) {
+            joinChannel()
+        }
         initKTVApi()
-        //joinChannel()
+        if (KeyCenter.isLeadSinger()) {
+            scheduledThreadPool.execute {
+                ApiManager.getInstance().fetchStartCloud(KeyCenter.channelId, 9527)
+            }
+        }
     }
 
     override fun onDestroy() {
+        if (KeyCenter.isLeadSinger()) {
+            scheduledThreadPool.execute {
+                ApiManager.getInstance().fetchStopCloud()
+            }
+        }
         ktvApi.switchSingerRole(KTVSingRole.Audience, null)
         ktvApi.removeEventHandler(ktvApiEventHandler)
         ktvApi.release()
@@ -73,20 +89,24 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
     private fun joinChannel() {
         val channelMediaOptions = ChannelMediaOptions().apply {
             autoSubscribeAudio = true
-            clientRoleType = if (KeyCenter.isAudience()) io.agora.rtc2.Constants.CLIENT_ROLE_AUDIENCE
-            else io.agora.rtc2.Constants.CLIENT_ROLE_BROADCASTER
+            clientRoleType = io.agora.rtc2.Constants.CLIENT_ROLE_AUDIENCE
             autoSubscribeVideo = false
             publishCameraTrack = false
-            publishMicrophoneTrack = !KeyCenter.isAudience()
+            publishMicrophoneTrack = false
         }
         RtcEngineController.rtcEngine.joinChannelEx(
-            RtcEngineController.rtcToken,
-            RtcConnection(KeyCenter.channelId, KeyCenter.localUid),
+            "",
+            RtcConnection(KeyCenter.channelId + "_ad", KeyCenter.localUid),
             channelMediaOptions,
             object : IRtcEngineEventHandler() {
                 override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
                     super.onJoinChannelSuccess(channel, uid, elapsed)
-                    ktvApi.renewInnerDataStreamId()
+                    //ktvApi.renewInnerDataStreamId()
+                }
+
+                override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
+                    super.onStreamMessage(uid, streamId, data)
+                    ktvApi.setAudienceStreamMessage(uid, streamId, data)
                 }
 
 //                override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
