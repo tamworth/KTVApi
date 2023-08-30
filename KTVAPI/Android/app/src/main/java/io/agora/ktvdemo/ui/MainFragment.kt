@@ -61,7 +61,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     success = { ret ->
                         val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc] ?: ""
                         val rtmToken = ret[TokenGenerator.AgoraTokenType.rtm] ?: ""
-                        TokenGenerator.generateToken("${KeyCenter.channelId}_ex", KeyCenter.localUid.toString(),
+                        TokenGenerator.generateToken(
+                            KeyCenter.channelId, "9528",
                             TokenGenerator.TokenGeneratorType.token007, TokenGenerator.AgoraTokenType.rtc,
                             success = { exToken ->
                                 val chorusToken = exToken

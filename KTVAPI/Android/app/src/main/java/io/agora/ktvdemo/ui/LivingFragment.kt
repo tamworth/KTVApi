@@ -39,7 +39,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
 
         initView()
         initKTVApi()
-        joinChannel()
+        //joinChannel()
     }
 
     override fun onDestroy() {
@@ -89,43 +89,43 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                     ktvApi.renewInnerDataStreamId()
                 }
 
-                override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
-                    super.onStreamMessage(uid, streamId, data)
-                    (ktvApi as KTVApiImpl).onStreamMessage(uid, streamId, data)
-                }
-
-                override fun onAudioVolumeIndication(
-                    speakers: Array<out AudioVolumeInfo>?,
-                    totalVolume: Int
-                ) {
-                    super.onAudioVolumeIndication(speakers, totalVolume)
-                    (ktvApi as KTVApiImpl).onAudioVolumeIndication(speakers, totalVolume)
-                }
-
-                override fun onLocalAudioStats(stats: LocalAudioStats?) {
-                    super.onLocalAudioStats(stats)
-                    (ktvApi as KTVApiImpl).onLocalAudioStats(stats)
-                }
-
-                override fun onAudioRouteChanged(routing: Int) {
-                    super.onAudioRouteChanged(routing)
-                    (ktvApi as KTVApiImpl).onAudioRouteChanged(routing)
-                }
-
-                override fun onAudioPublishStateChanged(
-                    channel: String?,
-                    oldState: Int,
-                    newState: Int,
-                    elapseSinceLastState: Int
-                ) {
-                    super.onAudioPublishStateChanged(
-                        channel,
-                        oldState,
-                        newState,
-                        elapseSinceLastState
-                    )
-                    (ktvApi as KTVApiImpl).onAudioPublishStateChanged(channel, oldState, newState, elapseSinceLastState)
-                }
+//                override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
+//                    super.onStreamMessage(uid, streamId, data)
+//                    (ktvApi as KTVApiImpl).onStreamMessage(uid, streamId, data)
+//                }
+//
+//                override fun onAudioVolumeIndication(
+//                    speakers: Array<out AudioVolumeInfo>?,
+//                    totalVolume: Int
+//                ) {
+//                    super.onAudioVolumeIndication(speakers, totalVolume)
+//                    (ktvApi as KTVApiImpl).onAudioVolumeIndication(speakers, totalVolume)
+//                }
+//
+//                override fun onLocalAudioStats(stats: LocalAudioStats?) {
+//                    super.onLocalAudioStats(stats)
+//                    (ktvApi as KTVApiImpl).onLocalAudioStats(stats)
+//                }
+//
+//                override fun onAudioRouteChanged(routing: Int) {
+//                    super.onAudioRouteChanged(routing)
+//                    (ktvApi as KTVApiImpl).onAudioRouteChanged(routing)
+//                }
+//
+//                override fun onAudioPublishStateChanged(
+//                    channel: String?,
+//                    oldState: Int,
+//                    newState: Int,
+//                    elapseSinceLastState: Int
+//                ) {
+//                    super.onAudioPublishStateChanged(
+//                        channel,
+//                        oldState,
+//                        newState,
+//                        elapseSinceLastState
+//                    )
+//                    (ktvApi as KTVApiImpl).onAudioPublishStateChanged(channel, oldState, newState, elapseSinceLastState)
+//                }
             }
         )
     }
@@ -140,7 +140,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
             "${KeyCenter.channelId}_ex",
             RtcEngineController.chorusChannelRtcToken,
             10,
-            KTVType.Normal,
+            KTVType.Cantata,
             if (KeyCenter.isMcc) KTVMusicType.SONG_CODE else KTVMusicType.SONG_URL
         )
         ktvApi.initialize(ktvApiConfig)
@@ -172,8 +172,18 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
             )
             ktvApi.loadMusic(KeyCenter.songCode, musicConfiguration, object : IMusicLoadStateListener {
                 override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
+                    val channelMediaOptions = ChannelMediaOptions().apply {
+                        autoSubscribeAudio = true
+                        clientRoleType = io.agora.rtc2.Constants.CLIENT_ROLE_BROADCASTER
+                        autoSubscribeVideo = false
+                        publishCameraTrack = false
+                        publishMicrophoneTrack = true
+                    }
+
                     if (KeyCenter.isLeadSinger()) {
-                        ktvApi.switchSingerRole(KTVSingRole.LeadSinger, object : ISwitchRoleStateListener {
+                        ktvApi.switchSingerRole(KTVSingRole.LeadSinger,
+                            CantataConfiguration(RtcEngineController.rtcToken, channelMediaOptions, 9528, RtcEngineController.chorusChannelRtcToken),
+                            object : ISwitchRoleStateListener {
                             override fun onSwitchRoleSuccess() {
                                 ktvApi.startSing(KeyCenter.songCode, 0)
                             }
@@ -183,7 +193,9 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                             }
                         })
                     } else if (KeyCenter.isCoSinger()) {
-                        ktvApi.switchSingerRole(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
+                        ktvApi.switchSingerRole(KTVSingRole.CoSinger,
+                            CantataConfiguration(RtcEngineController.rtcToken, channelMediaOptions, 9528, RtcEngineController.chorusChannelRtcToken),
+                            object : ISwitchRoleStateListener {
                             override fun onSwitchRoleSuccess() {
 
                             }

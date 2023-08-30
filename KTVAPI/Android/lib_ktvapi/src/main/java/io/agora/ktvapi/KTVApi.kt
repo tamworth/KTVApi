@@ -5,6 +5,7 @@ import io.agora.mediaplayer.IMediaPlayer
 import io.agora.musiccontentcenter.IAgoraMusicContentCenter
 import io.agora.musiccontentcenter.Music
 import io.agora.musiccontentcenter.MusicChartInfo
+import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 
@@ -15,7 +16,8 @@ import io.agora.rtc2.RtcEngine
  */
 enum class KTVType(val value: Int)  {
     Normal(0),
-    SingBattle(1)
+    SingBattle(1),
+    Cantata(2)
 }
 
 /**
@@ -236,6 +238,13 @@ data class KTVLoadMusicConfiguration(
     val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
 )
 
+data class CantataConfiguration(
+    val singChannelToken: String,
+    val singChannelMediaOptions: ChannelMediaOptions,
+    val musicStreamUid: Int,
+    val musicChannelToken: String
+)
+
 /**
  * 获取 KTVApi 实例
  */
@@ -428,6 +437,27 @@ interface KTVApi {
     )
 
     /**
+     * 异步切换演唱身份，结果会通过回调通知业务层
+     * @param newRole 新演唱身份
+     * @param switchRoleStateListener 切换演唱身份结果
+     *
+     * 允许的调用路径：
+     * 1、Audience -》SoloSinger 自己点的歌播放时
+     * 2、Audience -》LeadSinger 自己点的歌播放时， 且歌曲开始时就有合唱者加入
+     * 3、SoloSinger -》Audience 独唱结束时
+     * 4、Audience -》CoSinger   加入合唱时
+     * 5、CoSinger -》Audience   退出合唱时
+     * 6、SoloSinger -》LeadSinger 当前第一个合唱者加入合唱时，主唱由独唱切换成领唱
+     * 7、LeadSinger -》SoloSinger 最后一个合唱者退出合唱时，主唱由领唱切换成独唱
+     * 8、LeadSinger -》Audience 以领唱的身份结束歌曲时
+     */
+    fun switchSingerRole(
+        newRole: KTVSingRole,
+        config: CantataConfiguration,
+        switchRoleStateListener: ISwitchRoleStateListener?
+    )
+
+    /**
      * 播放歌曲
      * @param songCode 歌曲唯一编码
      * @param startPos 开始播放的位置
@@ -479,6 +509,12 @@ interface KTVApi {
      * @param audioPlayoutDelay 音频帧处理和播放的时间差
      */
     fun setAudioPlayoutDelay(audioPlayoutDelay: Int)
+
+    /**
+     * 设置演唱的分数，推荐使用歌词组建回调的单句得分
+     * @param score 演唱分数
+     */
+    fun setSingingScore(score: Int)
 
     /**
      * 获取mpk实例
