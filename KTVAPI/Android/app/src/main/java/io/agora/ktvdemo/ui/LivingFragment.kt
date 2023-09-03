@@ -59,7 +59,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                 ApiManager.getInstance().fetchStopCloud()
             }
         }
-        ktvApi.switchSingerRole(KTVSingRole.Audience, null)
+        ktvApi.switchSingerRole2(KTVSingRole.Audience, null)
         ktvApi.removeEventHandler(ktvApiEventHandler)
         ktvApi.release()
         RtcEngineController.rtcEngine.leaveChannel()
@@ -70,7 +70,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
         binding?.apply {
             karaokeView = KaraokeView(lyricsView,null)
             btnClose.setOnClickListener {
-                ktvApi.switchSingerRole(KTVSingRole.Audience, null)
+                ktvApi.switchSingerRole2(KTVSingRole.Audience, null)
                 ktvApi.removeEventHandler(ktvApiEventHandler)
                 ktvApi.release()
                 RtcEngineController.rtcEngine.leaveChannel()
@@ -99,8 +99,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                             publishMicrophoneTrack = true
                         }
 
-                        ktvApi.switchSingerRole(KTVSingRole.CoSinger,
-                            CantataConfiguration(RtcEngineController.rtcToken, channelMediaOptions, 9528, RtcEngineController.chorusChannelRtcToken),
+                        ktvApi.switchSingerRole2(KTVSingRole.CoSinger,
                             object : ISwitchRoleStateListener {
                                 override fun onSwitchRoleSuccess() {
 
@@ -129,8 +128,16 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
             }
 
             btnLeaveChorus.setOnClickListener {
-                ktvApi.switchSingerRole(KTVSingRole.Audience, null, null)
-                joinChannel()
+                ktvApi.switchSingerRole2(KTVSingRole.Audience, null)
+                val channelMediaOptions = ChannelMediaOptions().apply {
+                    autoSubscribeAudio = true
+                    clientRoleType = io.agora.rtc2.Constants.CLIENT_ROLE_AUDIENCE
+                    autoSubscribeVideo = false
+                    publishCameraTrack = false
+                    publishMicrophoneTrack = false
+                }
+                RtcEngineController.rtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, RtcConnection(KeyCenter.channelId, KeyCenter.CoSingerUid))
+
             }
         }
     }
@@ -157,44 +164,6 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                     super.onStreamMessage(uid, streamId, data)
                     ktvApi.setAudienceStreamMessage(uid, streamId, data)
                 }
-
-//                override fun onStreamMessage(uid: Int, streamId: Int, data: ByteArray?) {
-//                    super.onStreamMessage(uid, streamId, data)
-//                    (ktvApi as KTVApiImpl).onStreamMessage(uid, streamId, data)
-//                }
-//
-//                override fun onAudioVolumeIndication(
-//                    speakers: Array<out AudioVolumeInfo>?,
-//                    totalVolume: Int
-//                ) {
-//                    super.onAudioVolumeIndication(speakers, totalVolume)
-//                    (ktvApi as KTVApiImpl).onAudioVolumeIndication(speakers, totalVolume)
-//                }
-//
-//                override fun onLocalAudioStats(stats: LocalAudioStats?) {
-//                    super.onLocalAudioStats(stats)
-//                    (ktvApi as KTVApiImpl).onLocalAudioStats(stats)
-//                }
-//
-//                override fun onAudioRouteChanged(routing: Int) {
-//                    super.onAudioRouteChanged(routing)
-//                    (ktvApi as KTVApiImpl).onAudioRouteChanged(routing)
-//                }
-//
-//                override fun onAudioPublishStateChanged(
-//                    channel: String?,
-//                    oldState: Int,
-//                    newState: Int,
-//                    elapseSinceLastState: Int
-//                ) {
-//                    super.onAudioPublishStateChanged(
-//                        channel,
-//                        oldState,
-//                        newState,
-//                        elapseSinceLastState
-//                    )
-//                    (ktvApi as KTVApiImpl).onAudioPublishStateChanged(channel, oldState, newState, elapseSinceLastState)
-//                }
             }
         )
     }
@@ -204,15 +173,16 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
             BuildConfig.AGORA_APP_ID,
             RtcEngineController.rtmToken,
             RtcEngineController.rtcEngine,
-            KeyCenter.channelId,
+            KeyCenter.channelId + "_ad",
             KeyCenter.localUid,
-            "${KeyCenter.channelId}_ex",
-            RtcEngineController.chorusChannelRtcToken,
+            KeyCenter.channelId,
+            RtcEngineController.rtcToken,
             10,
             KTVType.Cantata,
             if (KeyCenter.isMcc) KTVMusicType.SONG_CODE else KTVMusicType.SONG_URL
         )
-        ktvApi.initialize(ktvApiConfig)
+        val giantChorusConfig = GiantChorusConfiguration("", 9528, RtcEngineController.chorusChannelRtcToken, 6)
+        ktvApi.initialize(ktvApiConfig, giantChorusConfig)
         ktvApi.addEventHandler(ktvApiEventHandler)
         ktvApi.renewInnerDataStreamId()
         ktvApi.setLrcView(object : ILrcView {
@@ -241,18 +211,8 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
             )
             ktvApi.loadMusic(KeyCenter.songCode, musicConfiguration, object : IMusicLoadStateListener {
                 override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
-                    val channelMediaOptions = ChannelMediaOptions().apply {
-                        autoSubscribeAudio = true
-                        clientRoleType = io.agora.rtc2.Constants.CLIENT_ROLE_BROADCASTER
-                        autoSubscribeVideo = false
-                        publishCameraTrack = false
-                        publishMicrophoneTrack = true
-                    }
-
                     if (KeyCenter.isLeadSinger()) {
-                        ktvApi.switchSingerRole(KTVSingRole.LeadSinger,
-                            CantataConfiguration(RtcEngineController.rtcToken, channelMediaOptions, 9528, RtcEngineController.chorusChannelRtcToken),
-                            object : ISwitchRoleStateListener {
+                        ktvApi.switchSingerRole2(KTVSingRole.LeadSinger, object : ISwitchRoleStateListener {
                             override fun onSwitchRoleSuccess() {
                                 ktvApi.startSing(KeyCenter.songCode, 0)
                             }
@@ -261,10 +221,16 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
 
                             }
                         })
+                        val channelMediaOptions = ChannelMediaOptions().apply {
+                            autoSubscribeAudio = true
+                            clientRoleType = io.agora.rtc2.Constants.CLIENT_ROLE_BROADCASTER
+                            autoSubscribeVideo = false
+                            publishCameraTrack = false
+                            publishMicrophoneTrack = true
+                        }
+                        RtcEngineController.rtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, RtcConnection(KeyCenter.channelId, KeyCenter.LeadSingerUid))
                     } else if (KeyCenter.isCoSinger()) {
-                        ktvApi.switchSingerRole(KTVSingRole.CoSinger,
-                            CantataConfiguration(RtcEngineController.rtcToken, channelMediaOptions, 9528, RtcEngineController.chorusChannelRtcToken),
-                            object : ISwitchRoleStateListener {
+                        ktvApi.switchSingerRole2(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
                             override fun onSwitchRoleSuccess() {
 
                             }
@@ -273,6 +239,15 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
 
                             }
                         })
+                        val channelMediaOptions = ChannelMediaOptions().apply {
+                            autoSubscribeAudio = true
+                            clientRoleType = io.agora.rtc2.Constants.CLIENT_ROLE_BROADCASTER
+                            autoSubscribeVideo = false
+                            publishCameraTrack = false
+                            publishMicrophoneTrack = true
+                        }
+                        RtcEngineController.rtcEngine.updateChannelMediaOptionsEx(channelMediaOptions, RtcConnection(KeyCenter.channelId, KeyCenter.CoSingerUid))
+
                     }
                 }
 
@@ -301,7 +276,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
             val lyricsModel = KaraokeView.parseLyricsData(fileLrc)
             karaokeView?.lyricsData = lyricsModel
             if (KeyCenter.isLeadSinger()) {
-                ktvApi.switchSingerRole(KTVSingRole.LeadSinger, object : ISwitchRoleStateListener {
+                ktvApi.switchSingerRole2(KTVSingRole.LeadSinger, object : ISwitchRoleStateListener {
                     override fun onSwitchRoleSuccess() {
                         ktvApi.startSing("$songPath$songName.mp3", 0)
                     }
@@ -311,7 +286,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                     }
                 })
             } else if (KeyCenter.isCoSinger()) {
-                ktvApi.switchSingerRole(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
+                ktvApi.switchSingerRole2(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
                     override fun onSwitchRoleSuccess() {
 
                     }

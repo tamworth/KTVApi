@@ -224,6 +224,13 @@ data class KTVApiConfig constructor(
     val musicType: KTVMusicType = KTVMusicType.SONG_CODE
 )
 
+data class GiantChorusConfiguration constructor(
+    val audienceChannelToken: String,
+    val musicStreamUid: Int,
+    val musicChannelToken: String,
+    val topN: Int = 0
+)
+
 /**
  * 加载歌曲的配置，不允许在一首歌没有load完成前（成功/失败均算完成）进行下一首歌的加载
  * @param autoPlay 是否自动播放歌曲（通常主唱选择true）默认为false
@@ -238,14 +245,6 @@ data class KTVLoadMusicConfiguration(
     val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
 )
 
-data class CantataConfiguration constructor(
-    val singChannelToken: String,
-    val singChannelMediaOptions: ChannelMediaOptions,
-    val musicStreamUid: Int,
-    val musicChannelToken: String,
-    val topN: Int = 0
-)
-
 /**
  * 获取 KTVApi 实例
  */
@@ -256,7 +255,7 @@ interface KTVApi {
      * 初始化内部变量/缓存数据，并注册相应的监听，必须在其他KTVApi调用前调用initialize初始化KTVApi
      * @param config 初始化KTVApi的配置
      */
-    fun initialize(config: KTVApiConfig)
+    fun initialize(config: KTVApiConfig, giantChorusConfig: GiantChorusConfiguration?)
 
     /**
      * 更新ktvapi内部使用的streamId，每次加入频道需要更新内部streamId
@@ -437,24 +436,9 @@ interface KTVApi {
         switchRoleStateListener: ISwitchRoleStateListener?
     )
 
-    /**
-     * 异步切换演唱身份，结果会通过回调通知业务层
-     * @param newRole 新演唱身份
-     * @param switchRoleStateListener 切换演唱身份结果
-     *
-     * 允许的调用路径：
-     * 1、Audience -》SoloSinger 自己点的歌播放时
-     * 2、Audience -》LeadSinger 自己点的歌播放时， 且歌曲开始时就有合唱者加入
-     * 3、SoloSinger -》Audience 独唱结束时
-     * 4、Audience -》CoSinger   加入合唱时
-     * 5、CoSinger -》Audience   退出合唱时
-     * 6、SoloSinger -》LeadSinger 当前第一个合唱者加入合唱时，主唱由独唱切换成领唱
-     * 7、LeadSinger -》SoloSinger 最后一个合唱者退出合唱时，主唱由领唱切换成独唱
-     * 8、LeadSinger -》Audience 以领唱的身份结束歌曲时
-     */
-    fun switchSingerRole(
+
+    fun switchSingerRole2(
         newRole: KTVSingRole,
-        config: CantataConfiguration?,
         switchRoleStateListener: ISwitchRoleStateListener?
     )
 
