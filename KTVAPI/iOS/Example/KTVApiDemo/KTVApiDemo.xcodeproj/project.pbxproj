@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E3CB4D602A935EBD00322389 /* 成都.xml in Resources */ = {isa = PBXBuildFile; fileRef = E3CB4D5F2A935EBD00322389 /* 成都.xml */; };
+		E3CB4D622A935ED600322389 /* 成都.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E3CB4D612A935ED600322389 /* 成都.mp3 */; };
 		E3ED270B2A822E9D0087B7AA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED270A2A822E9D0087B7AA /* AppDelegate.swift */; };
 		E3ED270D2A822E9D0087B7AA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED270C2A822E9D0087B7AA /* SceneDelegate.swift */; };
 		E3ED270F2A822E9D0087B7AA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED270E2A822E9D0087B7AA /* ViewController.swift */; };
@@ -34,6 +36,8 @@
 		0AFBE8E6CA2314F17EF33468 /* Pods_KTVApiDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KTVApiDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		91649F2302F7D5A73F303630 /* Pods-KTVApiDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KTVApiDemo.release.xcconfig"; path = "Target Support Files/Pods-KTVApiDemo/Pods-KTVApiDemo.release.xcconfig"; sourceTree = "<group>"; };
 		AFA8596CCA93FAF74AD1D2D5 /* Pods-KTVApiDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KTVApiDemo.debug.xcconfig"; path = "Target Support Files/Pods-KTVApiDemo/Pods-KTVApiDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		E3CB4D5F2A935EBD00322389 /* 成都.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "成都.xml"; sourceTree = "<group>"; };
+		E3CB4D612A935ED600322389 /* 成都.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "成都.mp3"; sourceTree = "<group>"; };
 		E3ED27072A822E9D0087B7AA /* KTVApiDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KTVApiDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E3ED270A2A822E9D0087B7AA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E3ED270C2A822E9D0087B7AA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -111,6 +115,8 @@
 				E3ED27232A8230A00087B7AA /* KeyCenter.swift */,
 				E3ED270A2A822E9D0087B7AA /* AppDelegate.swift */,
 				E3ED270C2A822E9D0087B7AA /* SceneDelegate.swift */,
+				E3CB4D5F2A935EBD00322389 /* 成都.xml */,
+				E3CB4D612A935ED600322389 /* 成都.mp3 */,
 				E3ED270E2A822E9D0087B7AA /* ViewController.swift */,
 				E3ED27252A8236750087B7AA /* KTVViewController.swift */,
 				E3ED27292A826B0D0087B7AA /* KTVLyricView.swift */,
@@ -209,8 +215,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E3CB4D622A935ED600322389 /* 成都.mp3 in Resources */,
 				E3ED27172A822E9E0087B7AA /* LaunchScreen.storyboard in Resources */,
 				E3ED27142A822E9E0087B7AA /* Assets.xcassets in Resources */,
+				E3CB4D602A935EBD00322389 /* 成都.xml in Resources */,
 				E3ED27122A822E9D0087B7AA /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -437,7 +445,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -468,7 +476,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

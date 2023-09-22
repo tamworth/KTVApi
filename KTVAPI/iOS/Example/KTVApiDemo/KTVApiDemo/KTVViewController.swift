@@ -89,33 +89,21 @@ class KTVViewController: UIViewController {
     }
     
     private func loadKTVApi() {
-        if type == .mcc {
-            getMccData(with: "\(userId)") {[weak self] rtcToken, rtmToken, rtcPlayerToken in
-                guard let self = self else {return}
-                self.rtcToken = rtcToken
-                self.rtmToken = rtmToken
-                self.rtcPlayerToken = rtcPlayerToken
-                
-                let apiConfig = KTVApiConfig(appId: KeyCenter.AppId, rtmToken: self.rtmToken ?? "", engine: self.rtcKit, channelName: self.channelName, localUid: self.userId, chorusChannelName: "\(self.channelName)_ex", chorusChannelToken: self.rtcPlayerToken ?? "", type: .normal, maxCacheSize: 10)
-                self.ktvApi = KTVApiImpl(config: apiConfig)
-                self.ktvApi.renewInnerDataStreamId()
-                self.ktvApi.setLrcView(view: self.lyricView)
-                self.ktvApi.addEventHandler(ktvApiEventHandler: self)
-                
-                self.rtcKit.joinChannel(byToken: KeyCenter.Token, channelId: self.channelName, uid: UInt(self.userId), mediaOptions: self.mediaOptions())
-                self.loadMusic()
-                self.switchRole()
-            }
-        } else {
-            let apiConfig = KTVApiConfig(appId: KeyCenter.AppId, rtmToken: "", engine: rtcKit, channelName: channelName, localUid: userId, chorusChannelName: "\(channelName)_ex", chorusChannelToken: "", type: .normal, maxCacheSize: 10)
-            ktvApi = KTVApiImpl(config: apiConfig)
-            ktvApi.renewInnerDataStreamId()
-            ktvApi.setLrcView(view: lyricView)
-            ktvApi.addEventHandler(ktvApiEventHandler: self)
+        getMccData(with: "\(userId)") {[weak self] rtcToken, rtmToken, rtcPlayerToken in
+            guard let self = self else {return}
+            self.rtcToken = rtcToken
+            self.rtmToken = rtmToken
+            self.rtcPlayerToken = rtcPlayerToken
             
-            rtcKit.joinChannel(byToken: KeyCenter.Token, channelId: channelName, uid: UInt(userId), mediaOptions: mediaOptions())
-            self.switchRole()
+            let apiConfig = KTVApiConfig(appId: KeyCenter.AppId, rtmToken: self.type == .mcc ? (self.rtmToken ?? "") : "", engine: self.rtcKit, channelName: self.channelName, localUid: self.userId, chorusChannelName: "\(self.channelName)_ex", chorusChannelToken: self.rtcPlayerToken ?? "", type: .normal, maxCacheSize: 10, musicType: self.type == .mcc ? .mcc : .local, isDebugMode: false)
+            self.ktvApi = KTVApiImpl(config: apiConfig)
+            self.ktvApi.renewInnerDataStreamId()
+            self.ktvApi.setLrcView(view: self.lyricView)
+            self.ktvApi.addEventHandler(ktvApiEventHandler: self)
+            
+            self.rtcKit.joinChannel(byToken: KeyCenter.Token, channelId: self.channelName, uid: UInt(self.userId), mediaOptions: self.mediaOptions())
             self.loadMusic()
+            self.switchRole()
         }
     }
     
@@ -127,7 +115,7 @@ class KTVViewController: UIViewController {
         options.channelProfile = .liveBroadcasting
         options.autoSubscribeAudio = true
         if type == .mcc {
-            options.publishMediaPlayerId = Int(ktvApi.getMediaPlayer()?.getMediaPlayerId() ?? 0)
+            options.publishMediaPlayerId = Int(ktvApi.getMusicPlayer()?.getMediaPlayerId() ?? 0)
         }
         options.enableAudioRecordingOrPlayout = true
         return options
@@ -143,7 +131,16 @@ class KTVViewController: UIViewController {
     
     private func loadMusic() {
         if type == .local {
-            ktvApi.loadMusic(config: KTVSongConfiguration(), url: "")
+            let mUrl = Bundle.main.path(forResource: "成都", ofType: "mp3")!
+            let lUrl = Bundle.main.path(forResource: "成都", ofType: "xml")!
+            let songConfig = KTVSongConfiguration()
+            songConfig.autoPlay = (role == .leadSinger || role == .soloSinger) ? true : false
+            songConfig.mode = role == .audience ? .loadNone : .loadMusicOnly
+            songConfig.mainSingerUid = mainSingerId
+            songConfig.songIdentifier = "chengdu"
+            ktvApi.loadMusic(config: songConfig, url: mUrl)
+            
+            self.lyricView.resetLrcData(with: lUrl)
         } else {
             let songConfig = KTVSongConfiguration()
             songConfig.autoPlay = (role == .leadSinger || role == .soloSinger) ? true : false
