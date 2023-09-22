@@ -7,27 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import io.agora.karaoke_view.v11.KaraokeView
+import io.agora.ktvapi.*
 import io.agora.ktvdemo.BuildConfig
 import io.agora.ktvdemo.rtc.RtcEngineController
 import io.agora.ktvdemo.databinding.FragmentLivingBinding
-import io.agora.ktvapi.IKTVApiEventHandler
-import io.agora.ktvapi.ILrcView
-import io.agora.ktvapi.IMusicLoadStateListener
-import io.agora.ktvapi.ISwitchRoleStateListener
-import io.agora.ktvapi.KTVApi
-import io.agora.ktvapi.KTVApiConfig
-import io.agora.ktvapi.KTVLoadMusicConfiguration
-import io.agora.ktvapi.KTVLoadMusicMode
-import io.agora.ktvapi.KTVLoadSongFailReason
-import io.agora.ktvapi.KTVSingRole
-import io.agora.ktvapi.MusicLoadStatus
-import io.agora.ktvapi.SwitchRoleFailReason
-import io.agora.ktvapi.createKTVApi
 import io.agora.ktvdemo.R
 import io.agora.ktvdemo.utils.DownloadUtils
 import io.agora.ktvdemo.utils.KeyCenter
 import io.agora.ktvdemo.utils.ZipUtils
-import io.agora.mediaplayer.Constants
 import io.agora.rtc2.ChannelMediaOptions
 import java.io.File
 
@@ -86,8 +73,8 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
             autoSubscribeAudio = true
             clientRoleType = if (KeyCenter.isAudience()) io.agora.rtc2.Constants.CLIENT_ROLE_AUDIENCE
             else io.agora.rtc2.Constants.CLIENT_ROLE_BROADCASTER
-            autoSubscribeVideo = false
-            autoSubscribeAudio = false
+            autoSubscribeVideo = true
+            autoSubscribeAudio = true
             publishCameraTrack = false
             publishMicrophoneTrack = !KeyCenter.isAudience()
         }
@@ -107,7 +94,10 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
             KeyCenter.channelId,
             KeyCenter.localUid,
             "${KeyCenter.channelId}_ex",
-            RtcEngineController.chorusChannelRtcToken
+            RtcEngineController.chorusChannelRtcToken,
+            10,
+            KTVType.Normal,
+            if (KeyCenter.isMcc) KTVMusicType.SONG_CODE else KTVMusicType.SONG_URL
         )
         ktvApi.initialize(ktvApiConfig)
         ktvApi.addEventHandler(ktvApiEventHandler)
