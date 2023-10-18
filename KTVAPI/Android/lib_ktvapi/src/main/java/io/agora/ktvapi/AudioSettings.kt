@@ -2,6 +2,11 @@ package io.agora.ktvapi
 
 import io.agora.rtc2.RtcEngine
 
+/**
+ * 场景类型
+ * @param KTV K歌房
+ * @param ChatRoom 语聊房
+ */
 enum class SceneType(val value: Int) {
     KTV(0),
     ChatRoom(1)
