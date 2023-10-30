@@ -817,6 +817,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     // 合唱
+    private var handlerEx :IRtcEngineEventHandler? = null
     private fun joinChorus2ndChannel(
         newRole: KTVSingRole,
         token: String,
@@ -856,52 +857,55 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             token,
             rtcConnection,
             channelMediaOption,
-            object : IRtcEngineEventHandler() {
-                override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
-                    Log.d(TAG, "onJoinChannel2Success: channel:$channel, uid:$uid")
-                    if (isRelease) return
-                    super.onJoinChannelSuccess(channel, uid, elapsed)
-                    if (newRole == KTVSingRole.LeadSinger) {
-                        mainSingerHasJoinChannelEx = true
-                    }
-                    onJoinChorus2ndChannelCallback(0)
-                    mRtcEngine.enableAudioVolumeIndicationEx(50, 10, true, rtcConnection)
-                }
+            null)
 
-                override fun onLeaveChannel(stats: RtcStats?) {
-                    Log.d(TAG, "onLeaveChannel2")
-                    if (isRelease) return
-                    super.onLeaveChannel(stats)
-                    if (newRole == KTVSingRole.LeadSinger) {
-                        mainSingerHasJoinChannelEx = false
-                    }
+        val handler = object : IRtcEngineEventHandler() {
+            override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
+                Log.d(TAG, "onJoinChannel2Success: channel:$channel, uid:$uid")
+                if (isRelease) return
+                super.onJoinChannelSuccess(channel, uid, elapsed)
+                if (newRole == KTVSingRole.LeadSinger) {
+                    mainSingerHasJoinChannelEx = true
                 }
+                onJoinChorus2ndChannelCallback(0)
+                mRtcEngine.enableAudioVolumeIndicationEx(50, 10, true, rtcConnection)
+            }
 
-                override fun onError(err: Int) {
-                    super.onError(err)
-                    if (isRelease) return
-                    if (err == ERR_JOIN_CHANNEL_REJECTED) {
-                        Log.e(TAG, "joinChorus2ndChannel failed: ERR_JOIN_CHANNEL_REJECTED")
-                        onJoinChorus2ndChannelCallback(ERR_JOIN_CHANNEL_REJECTED)
-                    } else if (err == ERR_LEAVE_CHANNEL_REJECTED) {
-                        Log.e(TAG, "leaveChorus2ndChannel failed: ERR_LEAVE_CHANNEL_REJECTED")
-                    }
-                }
-
-                override fun onTokenPrivilegeWillExpire(token: String?) {
-                    super.onTokenPrivilegeWillExpire(token)
-                    ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
-                }
-
-                override fun onAudioVolumeIndication(
-                    speakers: Array<out AudioVolumeInfo>?,
-                    totalVolume: Int
-                ) {
-                    super.onAudioVolumeIndication(speakers, totalVolume)
-                    ktvApiEventHandlerList.forEach { it.onChorusChannelAudioVolumeIndication(speakers, totalVolume) }
+            override fun onLeaveChannel(stats: RtcStats?) {
+                Log.d(TAG, "onLeaveChannel2")
+                if (isRelease) return
+                super.onLeaveChannel(stats)
+                if (newRole == KTVSingRole.LeadSinger) {
+                    mainSingerHasJoinChannelEx = false
                 }
             }
-        )
+
+            override fun onError(err: Int) {
+                super.onError(err)
+                if (isRelease) return
+                if (err == ERR_JOIN_CHANNEL_REJECTED) {
+                    Log.e(TAG, "joinChorus2ndChannel failed: ERR_JOIN_CHANNEL_REJECTED")
+                    onJoinChorus2ndChannelCallback(ERR_JOIN_CHANNEL_REJECTED)
+                } else if (err == ERR_LEAVE_CHANNEL_REJECTED) {
+                    Log.e(TAG, "leaveChorus2ndChannel failed: ERR_LEAVE_CHANNEL_REJECTED")
+                }
+            }
+
+            override fun onTokenPrivilegeWillExpire(token: String?) {
+                super.onTokenPrivilegeWillExpire(token)
+                ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
+            }
+
+            override fun onAudioVolumeIndication(
+                speakers: Array<out AudioVolumeInfo>?,
+                totalVolume: Int
+            ) {
+                super.onAudioVolumeIndication(speakers, totalVolume)
+                ktvApiEventHandlerList.forEach { it.onChorusChannelAudioVolumeIndication(speakers, totalVolume) }
+            }
+        }
+        handlerEx = handler
+        mRtcEngine.addHandlerEx(handler, rtcConnection)
 
         if (ret != 0) {
             Log.e(TAG, "joinChorus2ndChannel failed: $ret")
@@ -914,6 +918,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     private fun leaveChorus2ndChannel(role: KTVSingRole) {
+        mRtcEngine.removeHandlerEx(handlerEx, subChorusConnection)
         if (role == KTVSingRole.LeadSinger) {
             mRtcEngine.leaveChannelEx(subChorusConnection)
         } else if (role == KTVSingRole.CoSinger) {
