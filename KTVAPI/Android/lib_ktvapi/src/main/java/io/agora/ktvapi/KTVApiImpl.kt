@@ -283,6 +283,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
             val channelMediaOption = ChannelMediaOptions()
             channelMediaOption.token = chorusChannelRtcToken
             mRtcEngine.updateChannelMediaOptionsEx(channelMediaOption, subChorusConnection)
+            ktvApiConfig.chorusChannelToken = chorusChannelRtcToken
         }
     }
 

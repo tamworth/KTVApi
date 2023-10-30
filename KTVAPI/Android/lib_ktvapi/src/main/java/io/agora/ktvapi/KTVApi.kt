@@ -216,7 +216,7 @@ data class KTVApiConfig constructor(
     val channelName: String,
     val localUid: Int,
     val chorusChannelName: String,
-    val chorusChannelToken: String,
+    var chorusChannelToken: String,
     val maxCacheSize: Int = 10,
     val type: KTVType = KTVType.Normal,
     val musicType: KTVMusicType = KTVMusicType.SONG_CODE
