@@ -3,7 +3,8 @@ use_frameworks!
 platform :ios, '13.0'
 
 target 'KTVApiDemo' do
-  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.17'
+  pod 'AgoraRtcEngine_Special_iOS', '4.1.1.23'
   pod 'AgoraLyricsScore', '1.1.1-beta-3'
   pod 'Zip'
+  pod 'SVProgressHUD'
 end

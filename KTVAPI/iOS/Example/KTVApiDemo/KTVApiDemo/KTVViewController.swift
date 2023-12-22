@@ -6,7 +6,9 @@
 //
 
 import UIKit
+import Foundation
 import AgoraRtcKit
+import SVProgressHUD
 public enum LoadMusicType: Int {
     case mcc //声网歌曲中心
     case local //本地音乐
@@ -33,6 +35,18 @@ class KTVViewController: UIViewController {
     
     var lyricView: KTVLyricView!
     
+    let loadMusicBtn: UIButton = UIButton()
+    let cancelMusicBtn: UIButton = UIButton()
+    
+    let joinChorusBtn: UIButton = UIButton()
+    let leaveChorusBtn: UIButton = UIButton()
+    
+    let oriBtn: UIButton = UIButton()
+    let accBtn: UIButton = UIButton()
+    let leadBtn: UIButton = UIButton()
+    
+    private var loadMusicCallBack:((Bool, String)->Void)?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -57,18 +71,60 @@ class KTVViewController: UIViewController {
         layoutUI()
         joinRTCChannel()
         loadKTVApi()
-        
-        
+
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         leaveChannel()
     }
     
     private func layoutUI() {
-        lyricView = KTVLyricView(frame: CGRect(x: 50, y: 100, width: UIScreen.main.bounds.size.width - 100, height: 400))
+        lyricView = KTVLyricView(frame: CGRect(x: 50, y: 60, width: UIScreen.main.bounds.size.width - 100, height: 200))
         view.addSubview(lyricView)
+        
+        //加载歌曲
+        loadMusicBtn.frame = CGRect(x: 10, y: 270, width: 100, height: 40)
+        loadMusicBtn.backgroundColor = .gray
+        loadMusicBtn.setTitle("加载歌曲", for: .normal)
+        loadMusicBtn.addTarget(self, action: #selector(loadSong), for: .touchUpInside)
+        view.addSubview(loadMusicBtn)
+        
+        //溢出歌曲
+        cancelMusicBtn.frame = CGRect(x: 150, y: 270, width: 100, height: 40)
+        cancelMusicBtn.backgroundColor = .gray
+        cancelMusicBtn.setTitle("移除歌曲", for: .normal)
+        cancelMusicBtn.addTarget(self, action: #selector(cancelSong), for: .touchUpInside)
+        view.addSubview(cancelMusicBtn)
+        
+        //加入合唱
+        joinChorusBtn.frame = CGRect(x: 10, y: 320, width: 100, height: 40)
+        joinChorusBtn.backgroundColor = .gray
+        joinChorusBtn.setTitle("加入合唱", for: .normal)
+        joinChorusBtn.addTarget(self, action: #selector(joinChorus), for: .touchUpInside)
+        view.addSubview(joinChorusBtn)
+        
+        //离开合唱
+        leaveChorusBtn.frame = CGRect(x: 150, y: 320, width: 100, height: 40)
+        leaveChorusBtn.backgroundColor = .gray
+        leaveChorusBtn.setTitle("离开合唱", for: .normal)
+        leaveChorusBtn.addTarget(self, action: #selector(leaveChorus), for: .touchUpInside)
+        view.addSubview(leaveChorusBtn)
+        
+        //原唱
+        oriBtn.frame = CGRect(x: 10, y: 370, width: 100, height: 40)
+        oriBtn.backgroundColor = .gray
+        oriBtn.setTitle("原唱", for: .normal)
+        oriBtn.addTarget(self, action: #selector(oriSing), for: .touchUpInside)
+        view.addSubview(oriBtn)
+        
+        //伴奏
+        accBtn.frame = CGRect(x: 150, y: 370, width: 100, height: 40)
+        accBtn.backgroundColor = .gray
+        accBtn.setTitle("伴奏", for: .normal)
+        accBtn.addTarget(self, action: #selector(accSing), for: .touchUpInside)
+        view.addSubview(accBtn)
+
     }
     
     private func joinRTCChannel() {
@@ -103,7 +159,6 @@ class KTVViewController: UIViewController {
             
             self.rtcKit.joinChannel(byToken: KeyCenter.Token, channelId: self.channelName, uid: UInt(self.userId), mediaOptions: self.mediaOptions())
             self.loadMusic()
-            self.switchRole()
         }
     }
     
@@ -139,8 +194,8 @@ class KTVViewController: UIViewController {
             songConfig.mainSingerUid = mainSingerId
             songConfig.songIdentifier = "chengdu"
             ktvApi.loadMusic(config: songConfig, url: mUrl)
-            
             self.lyricView.resetLrcData(with: lUrl)
+            switchRole()
         } else {
             let songConfig = KTVSongConfiguration()
             songConfig.autoPlay = (role == .leadSinger || role == .soloSinger) ? true : false
@@ -148,6 +203,11 @@ class KTVViewController: UIViewController {
             songConfig.mainSingerUid = mainSingerId
             songConfig.songIdentifier = "\(mccSongCode)"
             ktvApi.loadMusic(songCode: mccSongCode, config: songConfig, onMusicLoadStateListener: self)
+            
+            self.loadMusicCallBack = {[weak self] flag, songCode in
+                guard let self = self else {return}
+                switchRole()
+            }
         }
     }
     
@@ -191,18 +251,78 @@ class KTVViewController: UIViewController {
     
 }
 
-extension KTVViewController: AgoraRtcEngineDelegate {
-    func rtcEngine(_ engine: AgoraRtcEngineKit, reportAudioVolumeIndicationOfSpeakers speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
-        if let ktvApi = self.ktvApi {
-            ktvApi.didKTVAPIReceiveAudioVolumeIndication(with: speakers, totalVolume: totalVolume)
+extension KTVViewController {
+    @objc private func loadSong() {
+        loadMusic()
+    }
+    
+    @objc private func cancelSong() {
+        if role == .audience {
+            //观众不能取消歌曲下载
+            SVProgressHUD.showInfo(withStatus: "当前身份不支持该操作")
+            
+        } else if type == .local {
+            //本地歌曲不能取消歌曲下载
+            SVProgressHUD.showInfo(withStatus: "当前场景不支持该操作")
+        } else {
+            self.ktvApi.removeMusic(songCode: mccSongCode)
         }
     }
     
-    func rtcEngine(_ engine: AgoraRtcEngineKit, receiveStreamMessageFromUid uid: UInt, streamId: Int, data: Data) {
-        if let ktvApi = self.ktvApi {
-            ktvApi.didKTVAPIReceiveStreamMessageFrom(uid: NSInteger(uid), streamId: streamId, data: data)
+    @objc private func joinChorus() {
+        if role == .audience {
+            role = .coSinger
+            loadMusic()
+            switchRole()
+        } else if role == .leadSinger || role == .soloSinger || role == .coSinger {
+            //主唱合唱不能加入
+            SVProgressHUD.showInfo(withStatus: "当前身份不支持该操作")
         }
     }
+}
+
+extension KTVViewController: AgoraRtcEngineDelegate {
+    func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
+
+    }
+    
+    @objc private func leaveChorus() {
+        if role == .coSinger {
+            //合唱者才能离开合唱
+            self.ktvApi.switchSingerRole(newRole: .audience) { state, reason in
+                self.role = .audience
+            }
+        } else {
+            SVProgressHUD.showInfo(withStatus: "当前身份不支持该操作")
+        }
+    }
+    
+    @objc private func oriSing() {
+        if role == .soloSinger || role == .leadSinger || role == .coSinger {
+            //主唱合唱才能原唱
+            if role == .soloSinger || role == .leadSinger {
+                self.ktvApi.getMusicPlayer()?.selectMultiAudioTrack(0, publishTrackIndex: 0)
+            } else {
+                self.ktvApi.getMusicPlayer()?.selectAudioTrack(0)
+            }
+        } else {
+            SVProgressHUD.showInfo(withStatus: "当前身份不支持该操作")
+        }
+    }
+    
+    @objc private func accSing() {
+        if role == .leadSinger || role == .leadSinger || role == .coSinger {
+            //主唱合唱才能原唱
+            if role == .soloSinger || role == .leadSinger {
+                self.ktvApi.getMusicPlayer()?.selectMultiAudioTrack(1, publishTrackIndex: 1)
+            } else {
+                self.ktvApi.getMusicPlayer()?.selectAudioTrack(1)
+            }
+        } else {
+            SVProgressHUD.showInfo(withStatus: "当前身份不支持该操作")
+        }
+    }
+
 }
 
 extension KTVViewController: IMusicLoadStateListener {
@@ -212,11 +332,18 @@ extension KTVViewController: IMusicLoadStateListener {
     }
     
     func onMusicLoadSuccess(songCode: Int, lyricUrl: String) {
-
+        if let loadMusicCallBack = self.loadMusicCallBack {
+            loadMusicCallBack(true, "\(songCode)")
+            self.loadMusicCallBack = nil
+        }
     }
     
     func onMusicLoadFail(songCode: Int, reason: KTVLoadSongFailReason) {
         //歌曲加载失败
+        if let loadMusicCallBack = self.loadMusicCallBack {
+            loadMusicCallBack(false, "\(songCode)")
+            self.loadMusicCallBack = nil
+        }
     }
 }
 
@@ -230,7 +357,7 @@ extension KTVViewController: KTVApiEventHandlerDelegate {
     }
     
     func onSingerRoleChanged(oldRole: KTVSingRole, newRole: KTVSingRole) {
-        
+        role = newRole
     }
     
     func onTokenPrivilegeWillExpire() {
@@ -240,5 +367,8 @@ extension KTVViewController: KTVApiEventHandlerDelegate {
     func onChorusChannelAudioVolumeIndication(speakers: [AgoraRtcAudioVolumeInfo], totalVolume: Int) {
         
     }
-
+    
+    func onMusicPlayerProgressChanged(with progress: Int) {
+        
+    }
 }

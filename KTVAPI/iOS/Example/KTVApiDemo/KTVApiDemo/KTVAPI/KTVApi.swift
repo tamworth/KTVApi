@@ -74,6 +74,8 @@ import AgoraRtcKit
 @objc public enum KTVType: Int {
     case normal
     case singbattle
+    case cantata
+    case singRelay
 }
 
 @objc public protocol IMusicLoadStateListener: NSObjectProtocol {
@@ -153,6 +155,9 @@ import AgoraRtcKit
     func onChorusChannelAudioVolumeIndication(
         speakers: [AgoraRtcAudioVolumeInfo],
         totalVolume: Int)
+    
+    //MPK时间回调 只给房主用 仅适合接唱
+    func onMusicPlayerProgressChanged(with progress: Int)
 }
 
 @objc open class KTVApiConfig: NSObject{
@@ -353,8 +358,8 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
     
     /// 设置当前mic开关状态目前关麦调用
     /// 目前关麦调用 adjustRecordSignalVolume(0) 后 onAudioVolumeIndication 仍然会执行， ktvApi需要增加一个变量判断当前是否关麦， 如果关麦把设置给歌词组件的pitch改为0
-    /// - Parameter isOnMicOpen: <#isOnMicOpen description#>
-    func setMicStatus(isOnMicOpen: Bool)
+    /// - Parameter muteStatus: mute mic status
+    func muteMic(muteStatus: Bool)
     
     func getMusicPlayer() -> AgoraRtcMediaPlayerProtocol?
     
@@ -398,5 +403,11 @@ public typealias JoinExChannelCallBack = ((Bool, KTVJoinChorusFailReason?)-> Voi
    * @param syncPts 是否同步切换前后的起始播放位置: true 同步，false 不同步，从 0 开始
    */
   func switchPlaySrc(url: String, syncPts: Bool)
-
+    
+  /**
+   * 取消歌曲下载，会打断加载歌曲的进程并移除歌曲缓存
+   * @param songCode 歌曲唯一编码
+   */
+      
+   func removeMusic(songCode: Int)
 }

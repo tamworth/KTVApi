@@ -1,6 +1,12 @@
 # KTAPI Demo
 
-> 本文档主要介绍如何快速跑通 <mark>KTAPI Demo</mark> 示例
+> 本文档主要介绍如何快速跑通 <mark>KTV场景化Api</mark> 示例工程，支持通过声网内容中心版权音乐和本地文件两种方式。
+>
+> **Demo 效果:**
+>
+> <img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/ktvapi_demo1.png" width="300" height="640"><img src="https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/ktv/ktvapi_demo2.png" width="300" height="640">
+---
+
 ## 1. 环境准备
 
 - <mark>最低兼容 iOS 13.0.0 </mark> 
@@ -43,4 +49,15 @@
 - 在 KTVApiDemo/iOS/Example/KTVApiemo 目录下，找到 KTVApiDemo.xcworkspace 文件
 - 用 Xcode 运行 .xcworkspace 文件 即可开始您的体验
 
+---
+
+### 3. 集成遇到困难，该如何联系声网获取协助
+
+> 方案1：如果您已经在使用声网服务或者在对接中，可以直接联系对接的销售或服务；
+>
+> 方案2：发送邮件给 [support@agora.io](mailto:support@agora.io) 咨询
+>
+> 方案3：扫码加入我们的微信交流群提问
+>
+> <img src="https://download.agora.io/demo/release/SDHY_QA.jpg" width="360" height="360">
 ---

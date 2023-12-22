@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KtvApiDemo</string>
+    <string name="app_name">KTVAPI-Demo</string>
     <string name="app_lead_singer">主唱</string>
     <string name="app_co_singer">合唱</string>
     <string name="app_audience">观众</string>
+    <string name="app_no_lyric">当前没有歌词</string>
+    <string name="app_join_chorus">加入合唱</string>
+    <string name="app_leave_chorus">离开合唱</string>
+    <string name="app_original">原唱</string>
+    <string name="app_acc">伴奏</string>
+    <string name="app_daochang">导唱</string>
+    <string name="app_no_premission">不能做这项操作</string>
+    <string name="app_load_music">加载歌曲</string>
+    <string name="app_remove_music">移除歌曲</string>
+    <string name="app_mic_on">开麦</string>
+    <string name="app_mic_off">关麦</string>
 </resources>
