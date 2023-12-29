@@ -58,6 +58,8 @@ android {
     }
 }
 
+apply from: "${rootDir.absolutePath}/git-hooks.gradle"
+
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.7.0'

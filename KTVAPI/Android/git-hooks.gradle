@@ -1,0 +1,6 @@
+task installGitHooks(type: Copy){
+    from "${rootDir.absolutePath}/../../.githooks/pre-commit"
+    into "${rootDir.absolutePath}/../../.git/hooks"
+    include 'pre-commit'
+}
+preBuild.dependsOn installGitHooks

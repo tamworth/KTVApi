@@ -313,7 +313,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     // 6、SoloSinger -》LeadSinger
     // 7、LeadSinger -》SoloSinger
     // 8、LeadSinger -》Audience
-    // 9、Cosinger -》LeadSinger
+    // 9、CoSinger -》LeadSinger
     var singerRole: KTVSingRole = KTVSingRole.Audience
     override fun switchSingerRole(
         newRole: KTVSingRole,
@@ -325,6 +325,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         // 调整开关麦状态
         if ((oldRole == KTVSingRole.LeadSinger || oldRole == KTVSingRole.SoloSinger) && (newRole == KTVSingRole.CoSinger || newRole == KTVSingRole.Audience) && !isOnMicOpen) {
             mRtcEngine.muteLocalAudioStream(true)
+            mRtcEngine.adjustRecordingSignalVolume(100)
         } else if ((oldRole == KTVSingRole.Audience || oldRole == KTVSingRole.CoSinger) && (newRole == KTVSingRole.LeadSinger || newRole == KTVSingRole.SoloSinger) && !isOnMicOpen) {
             mRtcEngine.adjustRecordingSignalVolume(0)
             mRtcEngine.muteLocalAudioStream(false)
@@ -688,6 +689,7 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
     }
 
     override fun setLrcView(view: ILrcView) {
+        reportCallScenarioApi("setLrcView", JSONObject())
         this.lrcView = view
     }
 

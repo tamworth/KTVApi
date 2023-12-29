@@ -1,0 +1,14 @@
+bash
+#!/bin/bash
+
+# 检查即将提交的文件是否包含 AGORA_APP_ID=
+if git diff --cached | grep -q '^+AGORA_APP_ID='; then
+  echo "ERROR: AGORA_APP_ID cannot be committed."
+  exit 1
+fi
+
+# 检查即将提交的文件是否包含 AGORA_APP_CERTIFICATE=
+if git diff --cached | grep -q '^+AGORA_APP_CERTIFICATE='; then
+  echo "ERROR: AGORA_APP_CERTIFICATE cannot be committed."
+  exit 1
+fi

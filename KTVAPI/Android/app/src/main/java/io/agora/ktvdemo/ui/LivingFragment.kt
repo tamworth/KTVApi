@@ -140,6 +140,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                             if (KeyCenter.isLeadSinger()) {
                                 ktvApi.switchSingerRole(KTVSingRole.LeadSinger, object : ISwitchRoleStateListener {
                                     override fun onSwitchRoleSuccess() {
+
                                         // 加载成功开始播放音乐
                                         ktvApi.startSing(KeyCenter.songCode, 0)
                                     }
@@ -177,6 +178,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                         }
                     })
                 } else {
+
                     // 使用本地音乐文件
                     val musicConfiguration = KTVLoadMusicConfiguration(
                         KeyCenter.songCode.toString(), false, KeyCenter.LeadSingerUid, KTVLoadMusicMode.LOAD_NONE
@@ -280,6 +282,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                 url?.let {
                     dealDownloadLrc(it)
                 }
+
             }
 
             override fun onHighPartTime(highStartTime: Long, highEndTime: Long) {

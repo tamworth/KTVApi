@@ -44,7 +44,10 @@ class KTVViewController: UIViewController {
     let oriBtn: UIButton = UIButton()
     let accBtn: UIButton = UIButton()
     let leadBtn: UIButton = UIButton()
-    
+
+    let muteBtn: UIButton = UIButton()
+    let unmuteBtn: UIButton = UIButton()
+
     private var loadMusicCallBack:((Bool, String)->Void)?
     
     override func viewDidLoad() {
@@ -124,6 +127,20 @@ class KTVViewController: UIViewController {
         accBtn.setTitle("伴奏", for: .normal)
         accBtn.addTarget(self, action: #selector(accSing), for: .touchUpInside)
         view.addSubview(accBtn)
+        
+        //开麦
+        muteBtn.frame = CGRect(x: 10, y: 420, width: 100, height: 40)
+        muteBtn.backgroundColor = .gray
+        muteBtn.setTitle("开麦", for: .normal)
+        muteBtn.addTarget(self, action: #selector(mute), for: .touchUpInside)
+        view.addSubview(muteBtn)
+        
+        //关麦
+        unmuteBtn.frame = CGRect(x: 150, y: 420, width: 100, height: 40)
+        unmuteBtn.backgroundColor = .gray
+        unmuteBtn.setTitle("关麦", for: .normal)
+        unmuteBtn.addTarget(self, action: #selector(unmute), for: .touchUpInside)
+        view.addSubview(unmuteBtn)
 
     }
     
@@ -279,6 +296,15 @@ extension KTVViewController {
             SVProgressHUD.showInfo(withStatus: "当前身份不支持该操作")
         }
     }
+
+    @objc private func mute() {
+        self.ktvApi.muteMic(muteStatus: true)
+    }
+    
+    @objc private func unmute() {
+        self.ktvApi.muteMic(muteStatus: false)
+    }
+
 }
 
 extension KTVViewController: AgoraRtcEngineDelegate {
