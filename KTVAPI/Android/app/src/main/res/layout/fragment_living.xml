@@ -62,7 +62,14 @@
         android:layout_height="wrap_content"
         android:text="@string/app_remove_music"
         app:layout_constraintTop_toBottomOf="@+id/lyricsView"
-        app:layout_constraintStart_toEndOf="@+id/btJoinChorus" />
+        app:layout_constraintStart_toEndOf="@+id/btLoadMusic" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btLoadProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/lyricsView"
+        app:layout_constraintStart_toEndOf="@+id/btRemoveMusic" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btJoinChorus"
@@ -119,5 +126,12 @@
         android:text="@string/app_mic_off"
         app:layout_constraintTop_toBottomOf="@+id/btOriginal"
         app:layout_constraintStart_toEndOf="@+id/btMicOn" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btMicStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/btOriginal"
+        app:layout_constraintStart_toEndOf="@+id/btMicOff" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,4 +15,9 @@
     <string name="app_remove_music">移除歌曲</string>
     <string name="app_mic_on">开麦</string>
     <string name="app_mic_off">关麦</string>
+    <string name="app_choose_role_tag">请选择初始演唱身份!</string>
+    <string name="app_input_channel_name">请输入 channel name</string>
+    <string name="app_mcc_tag">MCC 声网歌曲中心</string>
+    <string name="app_local_music_tag">Local 本地音乐</string>
+    <string name="app_start_enjoy_tag">开始体验</string>
 </resources>

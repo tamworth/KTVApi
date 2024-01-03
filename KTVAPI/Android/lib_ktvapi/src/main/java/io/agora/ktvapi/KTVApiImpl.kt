@@ -699,6 +699,10 @@ class KTVApiImpl : KTVApi, IMusicContentCenterEventHandler, IMediaPlayerObserver
         if (this.singerRole == KTVSingRole.SoloSinger || this.singerRole == KTVSingRole.LeadSinger) {
             mRtcEngine.adjustRecordingSignalVolume(if (isOnMicOpen) 100 else 0)
         } else {
+            val channelMediaOption = ChannelMediaOptions()
+            channelMediaOption.publishMicrophoneTrack = isOnMicOpen
+            channelMediaOption.clientRoleType = CLIENT_ROLE_BROADCASTER
+            mRtcEngine.updateChannelMediaOptions(channelMediaOption)
             mRtcEngine.muteLocalAudioStream(!isOnMicOpen)
         }
     }

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -16,7 +15,7 @@
         android:id="@+id/tvChooseRole"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="请选择合唱身份!"
+        android:text="@string/app_choose_role_tag"
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -30,24 +29,11 @@
         android:layout_marginHorizontal="32dp"
         android:layout_marginTop="32dp"
         android:background="@color/darker_gray"
-        android:text="主唱"
+        android:text="@string/app_lead_singer"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvChooseRole" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnCoSinger"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="16dp"
-        android:background="@color/lighter_gray"
-        android:text="合唱"
-        android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnLeadSinger" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnAudience"
@@ -56,22 +42,22 @@
         android:layout_marginHorizontal="32dp"
         android:layout_marginTop="16dp"
         android:background="@color/lighter_gray"
-        android:text="观众"
+        android:text="@string/app_audience"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnCoSinger" />
+        app:layout_constraintTop_toBottomOf="@id/btnLeadSinger" />
 
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/etChannelId"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="32dp"
-        android:hint="input channel id"
+        android:layout_marginTop="24dp"
+        android:hint="@string/app_input_channel_name"
         android:inputType="text"
-        android:maxLength="9"
         android:lines="1"
+        android:maxLength="9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnAudience" />
@@ -91,14 +77,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="MCC声网歌曲中心" />
+            android:text="@string/app_mcc_tag" />
 
         <RadioButton
             android:id="@+id/rbtLocalSong"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Local本地音乐" />
+            android:text="@string/app_local_music_tag" />
     </RadioGroup>
 
 
@@ -108,7 +94,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
         android:layout_marginTop="32dp"
-        android:text="开始合唱"
+        android:text="@string/app_start_enjoy_tag"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

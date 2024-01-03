@@ -1,6 +1,8 @@
 package io.agora.ktvdemo.ui
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -20,15 +22,28 @@ import io.agora.ktvdemo.utils.KeyCenter
 import io.agora.ktvdemo.utils.ZipUtils
 import io.agora.rtc2.ChannelMediaOptions
 import java.io.File
+import kotlin.random.Random
 
+/*
+ * K 歌体验页面
+ */
 class LivingFragment : BaseFragment<FragmentLivingBinding>() {
 
+    /*
+     * 歌词组件的 view
+     */
     private var karaokeView: KaraokeView? = null
 
+    /*
+     * KTVAPI 实例
+     */
     private val ktvApi: KTVApi by lazy {
         createKTVApi()
     }
 
+    /*
+     * KTVAPI 事件
+     */
     private val ktvApiEventHandler = object : IKTVApiEventHandler() {}
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentLivingBinding {
@@ -41,8 +56,10 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
         initView()
         initKTVApi()
         joinChannel()
+        loadMusic()
 
-        if (KeyCenter.isLeadSinger() || KeyCenter.isCoSinger()) {
+        // 设置麦克风初始状态，主唱默认开麦
+        if (KeyCenter.role == KTVSingRole.LeadSinger) {
             ktvApi.muteMic(false)
         }
     }
@@ -67,62 +84,89 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                 RtcEngineController.rtcEngine.leaveChannel()
                 findNavController().popBackStack()
             }
-            if (KeyCenter.isLeadSinger()) {
+            if (KeyCenter.role == KTVSingRole.LeadSinger) {
                 tvSinger.text = getString(R.string.app_lead_singer)
-            } else if (KeyCenter.isCoSinger()) {
-                tvSinger.text = getString(R.string.app_co_singer)
-            } else {
+            }  else {
                 tvSinger.text = getString(R.string.app_audience)
             }
 
             // 加入合唱
             btJoinChorus.setOnClickListener {
-                if (KeyCenter.isLeadSinger()) {
-                    Toast.makeText(MyApplication.app(), R.string.app_no_premission, Toast.LENGTH_SHORT).show()
+                if (KeyCenter.role == KTVSingRole.LeadSinger) {
+                    toast(getString(R.string.app_no_premission))
                 } else {
-                    ktvApi.switchSingerRole(KTVSingRole.CoSinger, null)
+                    ktvApi.switchSingerRole(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
+                        override fun onSwitchRoleSuccess() {
+                            mainHandler.post {
+                                toast("加入合唱成功")
+                                tvSinger.text = getString(R.string.app_co_singer)
+                                KeyCenter.role = KTVSingRole.CoSinger
+                            }
+                        }
+
+                        override fun onSwitchRoleFail(reason: SwitchRoleFailReason) {
+                            mainHandler.post {
+                                toast("加入合唱失败")
+                            }
+                        }
+                    })
                 }
             }
 
             // 退出合唱
             btLeaveChorus.setOnClickListener {
-                if (KeyCenter.isLeadSinger()) {
-                    Toast.makeText(MyApplication.app(), R.string.app_no_premission, Toast.LENGTH_SHORT).show()
+                if (KeyCenter.role == KTVSingRole.LeadSinger) {
+                    toast(getString(R.string.app_no_premission))
                 } else {
                     ktvApi.switchSingerRole(KTVSingRole.Audience, null)
+                    tvSinger.text = getString(R.string.app_audience)
+                    KeyCenter.role = KTVSingRole.Audience
+                    toast("退出合唱成功")
                 }
             }
 
             // 开原唱：仅领唱和合唱者可以做这项操作
             btOriginal.setOnClickListener {
-                if (KeyCenter.isLeadSinger()) {
-                    ktvApi.getMediaPlayer().selectMultiAudioTrack(0, 0)
-                } else if (KeyCenter.isCoSinger()) {
-                    ktvApi.getMediaPlayer().selectAudioTrack(0)
-                } else {
-                    Toast.makeText(MyApplication.app(), R.string.app_no_premission, Toast.LENGTH_SHORT).show()
+                when (KeyCenter.role) {
+                    KTVSingRole.LeadSinger -> {
+                        ktvApi.getMediaPlayer().selectMultiAudioTrack(0, 0)
+                    }
+                    KTVSingRole.CoSinger -> {
+                        ktvApi.getMediaPlayer().selectAudioTrack(0)
+                    }
+                    else -> {
+                        toast(getString(R.string.app_no_premission))
+                    }
                 }
             }
 
             // 开伴奏：仅领唱和合唱者可以做这项操作
             btAcc.setOnClickListener {
-                if (KeyCenter.isLeadSinger()) {
-                    ktvApi.getMediaPlayer().selectMultiAudioTrack(1, 1)
-                } else if (KeyCenter.isCoSinger()) {
-                    ktvApi.getMediaPlayer().selectAudioTrack(1)
-                } else {
-                    Toast.makeText(MyApplication.app(), R.string.app_no_premission, Toast.LENGTH_SHORT).show()
+                when (KeyCenter.role) {
+                    KTVSingRole.LeadSinger -> {
+                        ktvApi.getMediaPlayer().selectMultiAudioTrack(1, 1)
+                    }
+                    KTVSingRole.CoSinger -> {
+                        ktvApi.getMediaPlayer().selectAudioTrack(1)
+                    }
+                    else -> {
+                        toast(getString(R.string.app_no_premission))
+                    }
                 }
             }
 
             // 开导唱：仅领唱可以做这项操作，开启后领唱本地听到歌曲原唱，但观众听到仍为伴奏
             btDaoChang.setOnClickListener {
-                if (KeyCenter.isLeadSinger()) {
-                    ktvApi.getMediaPlayer().selectMultiAudioTrack(0, 1)
-                } else if (KeyCenter.isCoSinger()) {
-                    Toast.makeText(MyApplication.app(), R.string.app_no_premission, Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(MyApplication.app(), R.string.app_no_premission, Toast.LENGTH_SHORT).show()
+                when (KeyCenter.role) {
+                    KTVSingRole.LeadSinger -> {
+                        ktvApi.getMediaPlayer().selectMultiAudioTrack(0, 1)
+                    }
+                    KTVSingRole.CoSinger -> {
+                        toast(getString(R.string.app_no_premission))
+                    }
+                    else -> {
+                        toast(getString(R.string.app_no_premission))
+                    }
                 }
             }
 
@@ -132,12 +176,12 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                     // 使用声网版权中心歌单
                     val musicConfiguration = KTVLoadMusicConfiguration(
                         KeyCenter.songCode.toString(), false, KeyCenter.LeadSingerUid,
-                        if (KeyCenter.isAudience()) KTVLoadMusicMode.LOAD_LRC_ONLY else KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
+                        if (KeyCenter.role == KTVSingRole.Audience) KTVLoadMusicMode.LOAD_LRC_ONLY else KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
                     )
                     ktvApi.loadMusic(KeyCenter.songCode, musicConfiguration, object : IMusicLoadStateListener {
                         override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
                             Log.d("Music", "onMusicLoadSuccess, songCode: $songCode, lyricUrl: $lyricUrl")
-                            if (KeyCenter.isLeadSinger()) {
+                            if (KeyCenter.role == KTVSingRole.LeadSinger) {
                                 ktvApi.switchSingerRole(KTVSingRole.LeadSinger, object : ISwitchRoleStateListener {
                                     override fun onSwitchRoleSuccess() {
 
@@ -149,7 +193,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
 
                                     }
                                 })
-                            } else if (KeyCenter.isCoSinger()) {
+                            } else if (KeyCenter.role == KTVSingRole.CoSinger) {
                                 ktvApi.switchSingerRole(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
                                     override fun onSwitchRoleSuccess() {
 
@@ -173,12 +217,13 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                             msg: String?,
                             lyricUrl: String?
                         ) {
-                            lyricsView.setLabelShownWhenNoLyrics("$percent%")
                             Log.d("Music", "onMusicLoadProgress, songCode: $songCode, percent: $percent")
+                            mainHandler.post {
+                                binding?.btLoadProgress?.text = "下载进度：$percent%"
+                            }
                         }
                     })
                 } else {
-
                     // 使用本地音乐文件
                     val musicConfiguration = KTVLoadMusicConfiguration(
                         KeyCenter.songCode.toString(), false, KeyCenter.LeadSingerUid, KTVLoadMusicMode.LOAD_NONE
@@ -189,7 +234,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                     val fileLrc = File("$songPath$songName.xml")
                     val lyricsModel = KaraokeView.parseLyricsData(fileLrc)
                     karaokeView?.lyricsData = lyricsModel
-                    if (KeyCenter.isLeadSinger()) {
+                    if (KeyCenter.role == KTVSingRole.LeadSinger) {
                         ktvApi.switchSingerRole(KTVSingRole.LeadSinger, object : ISwitchRoleStateListener {
                             override fun onSwitchRoleSuccess() {
                                 ktvApi.startSing("$songPath$songName.mp3", 0)
@@ -199,7 +244,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
 
                             }
                         })
-                    } else if (KeyCenter.isCoSinger()) {
+                    } else if (KeyCenter.role == KTVSingRole.CoSinger) {
                         ktvApi.switchSingerRole(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
                             override fun onSwitchRoleSuccess() {
 
@@ -219,40 +264,34 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                     ktvApi.removeMusic(KeyCenter.songCode)
                     lyricsView.reset()
                 } else {
-                    Toast.makeText(MyApplication.app(), R.string.app_no_premission, Toast.LENGTH_SHORT).show()
+                    toast(getString(R.string.app_no_premission))
                 }
             }
 
             // 开麦
             btMicOn.setOnClickListener {
                 ktvApi.muteMic(false)
+                btMicStatus.text = "麦克风开"
             }
 
             // 关麦
             btMicOff.setOnClickListener {
                 ktvApi.muteMic(true)
+                btMicStatus.text = "麦克风关"
+            }
+
+            // 设置麦克风初始状态
+            if (KeyCenter.role == KTVSingRole.LeadSinger) {
+                btMicStatus.text = "麦克风开"
+            } else {
+                btMicStatus.text = "麦克风关"
             }
         }
     }
 
-    private fun joinChannel() {
-        val channelMediaOptions = ChannelMediaOptions().apply {
-            autoSubscribeAudio = true
-            clientRoleType = if (KeyCenter.isAudience()) io.agora.rtc2.Constants.CLIENT_ROLE_AUDIENCE
-            else io.agora.rtc2.Constants.CLIENT_ROLE_BROADCASTER
-            autoSubscribeVideo = true
-            autoSubscribeAudio = true
-            publishCameraTrack = false
-            publishMicrophoneTrack = !KeyCenter.isAudience()
-        }
-        RtcEngineController.rtcEngine.joinChannel(
-            RtcEngineController.rtcToken,
-            KeyCenter.channelId,
-            KeyCenter.localUid,
-            channelMediaOptions
-        )
-    }
-
+    /*
+     * 初始化 KTVAPI
+     */
     private fun initKTVApi() {
         val ktvApiConfig = KTVApiConfig(
             BuildConfig.AGORA_APP_ID,
@@ -266,8 +305,11 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
             KTVType.Normal,
             if (KeyCenter.isMcc) KTVMusicType.SONG_CODE else KTVMusicType.SONG_URL
         )
+        // 初始化 ktvapi 模块
         ktvApi.initialize(ktvApiConfig)
+        // 注册 ktvapi 事件
         ktvApi.addEventHandler(ktvApiEventHandler)
+        // 设置歌词组件
         ktvApi.setLrcView(object : ILrcView {
             override fun onUpdatePitch(pitch: Float?) {
             }
@@ -282,12 +324,104 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                 url?.let {
                     dealDownloadLrc(it)
                 }
-
             }
 
             override fun onHighPartTime(highStartTime: Long, highEndTime: Long) {
             }
         })
+    }
+
+    /*
+     * 加入 RTC 频道
+     */
+    private fun joinChannel() {
+        val channelMediaOptions = ChannelMediaOptions().apply {
+            autoSubscribeAudio = true
+            autoSubscribeVideo = true
+            autoSubscribeAudio = true
+            publishCameraTrack = false
+            publishMicrophoneTrack = KeyCenter.role != KTVSingRole.Audience
+            clientRoleType = if (KeyCenter.role == KTVSingRole.Audience) io.agora.rtc2.Constants.CLIENT_ROLE_AUDIENCE else io.agora.rtc2.Constants.CLIENT_ROLE_BROADCASTER
+        }
+        RtcEngineController.rtcEngine.joinChannel(
+            RtcEngineController.rtcToken,
+            KeyCenter.channelId,
+            KeyCenter.localUid,
+            channelMediaOptions
+        )
+
+        // 加入频道后需要更新数据传输通道
+        ktvApi.renewInnerDataStreamId()
+    }
+
+    /*
+     * 加载、播放音乐
+     */
+    private fun loadMusic() {
+        if (KeyCenter.isMcc) {
+            // 使用声网版权中心歌单
+            val musicConfiguration = KTVLoadMusicConfiguration(
+                KeyCenter.songCode.toString(), false, KeyCenter.LeadSingerUid,
+                if (KeyCenter.role == KTVSingRole.Audience) KTVLoadMusicMode.LOAD_LRC_ONLY else KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
+            )
+            ktvApi.loadMusic(KeyCenter.songCode, musicConfiguration, object : IMusicLoadStateListener {
+                override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
+                    Log.d("Music", "onMusicLoadSuccess, songCode: $songCode, lyricUrl: $lyricUrl")
+                    if (KeyCenter.role == KTVSingRole.LeadSinger) {
+                        ktvApi.switchSingerRole(KTVSingRole.LeadSinger, object : ISwitchRoleStateListener {
+                            override fun onSwitchRoleSuccess() {
+
+                                // 加载成功开始播放音乐
+                                ktvApi.startSing(KeyCenter.songCode, 0)
+                            }
+
+                            override fun onSwitchRoleFail(reason: SwitchRoleFailReason) {
+
+                            }
+                        })
+                    }
+                }
+
+                override fun onMusicLoadFail(songCode: Long, reason: KTVLoadSongFailReason) {
+                    Log.d("Music", "onMusicLoadFail, songCode: $songCode, reason: $reason")
+                }
+
+                override fun onMusicLoadProgress(
+                    songCode: Long,
+                    percent: Int,
+                    status: MusicLoadStatus,
+                    msg: String?,
+                    lyricUrl: String?
+                ) {
+                    Log.d("Music", "onMusicLoadProgress, songCode: $songCode, percent: $percent")
+                    mainHandler.post {
+                        binding?.btLoadProgress?.text = "下载进度：$percent%"
+                    }
+                }
+            })
+        } else {
+            // 使用本地音乐文件
+            val musicConfiguration = KTVLoadMusicConfiguration(
+                KeyCenter.songCode.toString(), false, KeyCenter.LeadSingerUid, KTVLoadMusicMode.LOAD_NONE
+            )
+            val songPath = requireActivity().filesDir.absolutePath + File.separator
+            val songName = "成都"
+            ktvApi.loadMusic("$songPath$songName.mp3", musicConfiguration)
+            val fileLrc = File("$songPath$songName.xml")
+            val lyricsModel = KaraokeView.parseLyricsData(fileLrc)
+            karaokeView?.lyricsData = lyricsModel
+            if (KeyCenter.role == KTVSingRole.LeadSinger) {
+                ktvApi.switchSingerRole(KTVSingRole.LeadSinger, object : ISwitchRoleStateListener {
+                    override fun onSwitchRoleSuccess() {
+                        ktvApi.startSing("$songPath$songName.mp3", 0)
+                    }
+
+                    override fun onSwitchRoleFail(reason: SwitchRoleFailReason) {
+
+                    }
+                })
+            }
+        }
     }
 
     private fun dealDownloadLrc(url: String) {
