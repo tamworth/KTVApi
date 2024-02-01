@@ -12,7 +12,7 @@ object KeyCenter {
     /*
      * 测试歌曲的 songCode
      */
-    const val songCode: Long = 6625526607662280
+    const val songCode: Long = 6625526603433040
 
     /*
      * 加入的频道名
@@ -28,6 +28,11 @@ object KeyCenter {
      * 选择的歌曲类型
      */
     var isMcc: Boolean = true
+
+    /*
+     * 体验 KTVAPI 的类型， true为普通合唱、false为大合唱
+     */
+    var isNormalChorus: Boolean = true
 
     /*
      * 当前演唱中的身份

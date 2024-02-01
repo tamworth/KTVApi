@@ -18,5 +18,7 @@
     <string name="app_input_channel_name">请输入 channel name</string>
     <string name="app_mcc_tag">MCC 声网歌曲中心</string>
     <string name="app_local_music_tag">Local 本地音乐</string>
+    <string name="app_normal_ktvapi_tag">独唱、小合唱</string>
+    <string name="app_giant_ktvapi_tag">大合唱</string>
     <string name="app_start_enjoy_tag">开始体验</string>
 </resources>
