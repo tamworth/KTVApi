@@ -626,7 +626,10 @@ class KTVGiantChorusApiImpl(
 
         // 导唱
         mPlayer.setPlayerOption("enable_multi_audio_track", 1)
-        (mPlayer as IAgoraMusicPlayer).open(songCode, startPos)
+        val ret = (mPlayer as IAgoraMusicPlayer).open(songCode, startPos)
+        if (ret != 0) {
+            ktvApiLogError("mpk open failed: $ret")
+        }
     }
 
     override fun startSing(url: String, startPos: Long) {
@@ -644,7 +647,10 @@ class KTVGiantChorusApiImpl(
 
         // 导唱
         mPlayer.setPlayerOption("enable_multi_audio_track", 1)
-        mPlayer.open(url, startPos)
+        val ret = mPlayer.open(url, startPos)
+        if (ret != 0) {
+            ktvApiLogError("mpk open failed: $ret")
+        }
     }
 
     override fun resumeSing() {
@@ -879,9 +885,15 @@ class KTVGiantChorusApiImpl(
                 // 导唱
                 mPlayer.setPlayerOption("enable_multi_audio_track", 1)
                 if (giantChorusApiConfig.musicType == KTVMusicType.SONG_CODE) {
-                    (mPlayer as IAgoraMusicPlayer).open(songCode, 0) // TODO open failed
+                    val ret = (mPlayer as IAgoraMusicPlayer).open(songCode, 0) // TODO open failed
+                    if (ret != 0) {
+                        ktvApiLogError("mpk open failed: $ret")
+                    }
                 } else {
-                    mPlayer.open(songUrl, 0) // TODO open failed
+                    val ret = mPlayer.open(songUrl, 0) // TODO open failed
+                    if (ret != 0) {
+                        ktvApiLogError("mpk open failed: $ret")
+                    }
                 }
             }
             else -> {

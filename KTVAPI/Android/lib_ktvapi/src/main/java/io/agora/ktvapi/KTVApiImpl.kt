@@ -705,7 +705,10 @@ class KTVApiImpl(
 
         // 导唱
         mPlayer.setPlayerOption("enable_multi_audio_track", 1)
-        (mPlayer as IAgoraMusicPlayer).open(songCode, startPos)
+        val ret = (mPlayer as IAgoraMusicPlayer).open(songCode, startPos)
+        if (ret != 0) {
+            ktvApiLogError("mpk open failed: $ret")
+        }
     }
 
     override fun startSing(url: String, startPos: Long) {
@@ -723,7 +726,10 @@ class KTVApiImpl(
 
         // 导唱
         mPlayer.setPlayerOption("enable_multi_audio_track", 1)
-        mPlayer.open(url, startPos)
+        val ret = mPlayer.open(url, startPos)
+        if (ret != 0) {
+            ktvApiLogError("mpk open failed: $ret")
+        }
     }
 
     override fun resumeSing() {
@@ -811,10 +817,16 @@ class KTVApiImpl(
                 // 预加载歌曲成功
                 if (ktvApiConfig.musicType == KTVMusicType.SONG_CODE) {
                     mPlayer.setPlayerOption("enable_multi_audio_track", 0)
-                    (mPlayer as IAgoraMusicPlayer).open(songCode, 0) // TODO open failed
+                    val ret = (mPlayer as IAgoraMusicPlayer).open(songCode, 0) // TODO open failed
+                    if (ret != 0) {
+                        ktvApiLogError("mpk open failed: $ret")
+                    }
                 } else {
                     mPlayer.setPlayerOption("enable_multi_audio_track", 0)
-                    mPlayer.open(songUrl, 0) // TODO open failed
+                    val ret = mPlayer.open(songUrl, 0) // TODO open failed
+                    if (ret != 0) {
+                        ktvApiLogError("mpk open failed: $ret")
+                    }
                 }
 
                 // 预加载成功后加入第二频道：预加载时间>>joinChannel时间
