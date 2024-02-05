@@ -154,7 +154,6 @@ fileprivate enum KTVSongMode: Int {
         engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
         engine.setParameters("{\"che.audio.ans.noise_gate\": 20}")
         engine.setParameters("{\"rtc.use_audio4\": true}")
-        engine.setParameters("{\"rtc.max_audio_metadata_length\": 200}")
         if apiConfig?.type == .singRelay {
             engine.setParameters("{\"che.audio.aiaec.working_mode\": 1}")
         }
@@ -173,7 +172,7 @@ fileprivate enum KTVSongMode: Int {
         dataStreamConfig.syncWithAudio = true
         self.apiConfig?.engine?.createDataStream(&dataStreamId, config: dataStreamConfig)
         sendCustomMessage(with: "renewInnerDataStreamId", label: "")
-        agoraPrint("")
+        agoraPrint("renewInnerDataStreamId")
     }
 }
 
@@ -405,11 +404,19 @@ extension KTVApiImpl {
     }
 
     private func agoraPrint(_ message: String) {
-        apiConfig?.engine?.writeLog(.info, content: message)
+        #if DEBUG
+            print(message)
+        #else
+            apiConfig?.engine?.writeLog(.info, content: message)
+        #endif
     }
     
     private func agoraPrintError(_ message: String) {
-        apiConfig?.engine?.writeLog(.error, content: message)
+        #if DEBUG
+            print(message)
+        #else
+            apiConfig?.engine?.writeLog(.error, content: message)
+        #endif
     }
 }
 
@@ -867,7 +874,7 @@ extension KTVApiImpl {
     
     @objc func enableProfessionalStreamerMode(_ enable: Bool)   {
         if self.isPublishAudio == false {return}
-        agoraPrint("enableProfessionalStreamerMode")
+        agoraPrint("enableProfessionalStreamerMode enable:\(enable)")
         self.enableProfessional = enable
         //专业非专业还需要根据是否佩戴耳机来判断是否开启3A
         apiConfig?.engine?.setAudioProfile(enable ? .musicHighQualityStereo : .musicStandardStereo)
@@ -886,6 +893,7 @@ extension KTVApiImpl {
             
         }
     }
+    
 }
 
 // rtc的子频道代理回调
@@ -1451,7 +1459,7 @@ extension Date {
 
 extension KTVApiImpl: KTVApiRTCDelegate {
     func didJoinChannel(channel: String, withUid uid: UInt, elapsed: Int) {
-        print("ktvapi加入主频道成功")
+        agoraPrint("ktvapi加入主频道成功")
     }
     
     func didJoinedOfUid(uid: UInt, elapsed: Int) {
@@ -1486,7 +1494,7 @@ extension KTVApiImpl: KTVApiRTCDelegate {
     func didAudioPublishStateChange(channelId: String, oldState: AgoraStreamPublishState, newState: AgoraStreamPublishState, elapseSinceLastState: Int32) {
         self.isPublishAudio = newState == .published
         enableProfessionalStreamerMode(self.enableProfessional)
-        print("PublishStateChange:\(newState)")
+        agoraPrint("PublishStateChange:\(newState)")
     }
     
     func receiveStreamMessageFromUid(uid: UInt, streamId: Int, data: Data) {
@@ -1514,7 +1522,7 @@ extension KTVApiImpl: KTVApiRTCDelegate {
     }
     
     func didRTCAudioRouteChanged(routing: AgoraAudioOutputRouting) {
-        print("Route changed:\(routing)")
+        agoraPrint("Route changed:\(routing)")
         let headPhones: [AgoraAudioOutputRouting] = [.headset, .headsetBluetooth, .headsetNoMic]
         let wearHeadPhone: Bool = headPhones.contains(routing)
         if wearHeadPhone == self.isWearingHeadPhones {

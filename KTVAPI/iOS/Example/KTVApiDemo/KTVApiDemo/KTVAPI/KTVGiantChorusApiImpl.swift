@@ -271,7 +271,7 @@ extension KTVGiantChorusApiImpl {
     
     //主要针对本地歌曲播放的主唱伴奏切换的 MCC直接忽视这个方法
     func switchPlaySrc(url: String, syncPts: Bool) {
-        agoraPrint("switchPlaySrc called: (url)")
+        agoraPrint("switchPlaySrc called: \(url)")
         
         if self.songUrl != url && self.songUrl2 != url {
             print("switchPlaySrc failed: canceled")
@@ -358,7 +358,7 @@ extension KTVGiantChorusApiImpl {
     
     func renewToken(rtmToken: String, chorusChannelRtcToken: String) {
         sendCustomMessage(with: "renewToken", label: "rtmToken:\(rtmToken), chorusChannelRtcToken:\(chorusChannelRtcToken)")
-        agoraPrint("renewToken")
+        agoraPrint("renewToken rtmToken:\(rtmToken) chorusChannelRtcToken:\(chorusChannelRtcToken)")
             // 更新RtmToken
         mcc?.renewToken(rtmToken)
             // 更新合唱频道RtcToken
@@ -466,11 +466,19 @@ extension KTVGiantChorusApiImpl {
     }
 
     private func agoraPrint(_ message: String) {
-        apiConfig?.engine?.writeLog(.info, content: message)
+        #if DEBUG
+            print(message)
+        #else
+            apiConfig?.engine?.writeLog(.info, content: message)
+        #endif
     }
     
     private func agoraPrintError(_ message: String) {
-        apiConfig?.engine?.writeLog(.error, content: message)
+        #if DEBUG
+            print(message)
+        #else
+            apiConfig?.engine?.writeLog(.error, content: message)
+        #endif
     }
 
 }
@@ -1188,7 +1196,9 @@ extension KTVGiantChorusApiImpl {
                 let ntpTime = dict["ntp"] as? Int,
                 let songId = dict["songIdentifier"] as? String
         else { return }
-        print("realTime:\(realPosition) position:\(position) lastNtpTime:\(lastNtpTime) ntpTime:\(ntpTime) ntpGap:\(ntpTime - self.lastNtpTime) ")
+        #if DUBUG
+            print("realTime:\(realPosition) position:\(position) lastNtpTime:\(lastNtpTime) ntpTime:\(ntpTime) ntpGap:\(ntpTime - self.lastNtpTime) ")
+        #endif
         //如果接收到的歌曲和自己本地的歌曲不一致就不更新进度
 //        guard songCode == self.songCode else {
 //            agoraPrint("local songCode[\(songCode)] is not equal to recv songCode[\(self.songCode)] role: \(singerRole.rawValue)")
@@ -1202,8 +1212,9 @@ extension KTVGiantChorusApiImpl {
 //        self.lastMainSingerUpdateTime = Date().milListamp
 //        self.remotePlayerPosition = TimeInterval(realPosition)
         if self.playerState != state {
-            agoraPrint("[setLrcTime] recv state: \(self.playerState.rawValue)->\(state.rawValue) role: \(singerRole.rawValue) role: \(singerRole.rawValue)")
-            
+            #if DUBUG
+            print("[setLrcTime] recv state: \(self.playerState.rawValue)->\(state.rawValue) role: \(singerRole.rawValue) role: \(singerRole.rawValue)")
+            #endif
             if state == .playing, singerRole == .coSinger, playerState == .openCompleted {
                 //如果是伴唱等待主唱开始播放，seek 到指定位置开始播放保证歌词显示位置准确
                 self.localPlayerPosition = self.lastMainSingerUpdateTime - Double(position)
@@ -1267,7 +1278,9 @@ extension KTVGiantChorusApiImpl {
             let threshold = expectPosition - Int(localPosition)
             let ntpTime = dict["ntp"] as? Int ?? 0
             let time = dict["time"] as? Int64 ?? 0
-         //   agoraPrint("checkNtp, diff:\(threshold), localNtp:\(getNtpTimeInMs()), localPosition:\(localPosition), audioPlayoutDelay:\(audioPlayoutDelay), remoteDiff:\(String(describing: ntpTime - Int(time)))")
+            #if DUBUG
+            agoraPrint("checkNtp, diff:\(threshold), localNtp:\(getNtpTimeInMs()), localPosition:\(localPosition), audioPlayoutDelay:\(audioPlayoutDelay), remoteDiff:\(String(describing: ntpTime - Int(time)))")
+            #endif
             if abs(threshold) > 50 {
                 agoraPrint("need seek, time:\(threshold)")
                  mediaPlayer?.seek(toPosition: expectPosition)
@@ -1556,7 +1569,9 @@ extension KTVGiantChorusApiImpl: AgoraRtcMediaPlayerDelegate {
                                        "forward": true,
                                        "ver":2,
            ]
-         //  print("position_ms:\(position_ms), ntp:\(getNtpTimeInMs()), delta:\(self.getNtpTimeInMs() - position_ms), autoPlayoutDelay:\(self.audioPlayoutDelay), state:\(self.playerState.rawValue)")
+           #if DEBUG
+            print("position_ms:\(position_ms), ntp:\(getNtpTimeInMs()), delta:\(self.getNtpTimeInMs() - position_ms), autoPlayoutDelay:\(self.audioPlayoutDelay), state:\(self.playerState.rawValue)")
+           #endif
            sendStreamMessageWithDict(dict, success: nil)
        }
    }

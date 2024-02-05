@@ -130,6 +130,7 @@
 				E3ED27292A826B0D0087B7AA /* KTVLyricView.swift */,
 				E3ED272B2A8312120087B7AA /* FileDownloadCache */,
 				E3ED27272A8243480087B7AA /* NetworkManager.swift */,
+				E38BDE792B6F7ABD007A2834 /* ApiManager.swift */,
 				E3ED271E2A822ED30087B7AA /* KTVAPI */,
 				E3ED27102A822E9D0087B7AA /* Main.storyboard */,
 				E3ED27132A822E9E0087B7AA /* Assets.xcassets */,
@@ -145,7 +146,6 @@
 				E3ED271F2A822ED30087B7AA /* KTVApiImpl.swift */,
 				E3ED27202A822ED30087B7AA /* KTVApi.swift */,
 				E38BDE772B6F7A77007A2834 /* KTVGiantChorusApiImpl.swift */,
-				E38BDE792B6F7ABD007A2834 /* ApiManager.swift */,
 				E39BAF742B6CC695002C692F /* LrcTime.pb.swift */,
 				E39BAF752B6CC695002C692F /* LrcTime.proto */,
 			);

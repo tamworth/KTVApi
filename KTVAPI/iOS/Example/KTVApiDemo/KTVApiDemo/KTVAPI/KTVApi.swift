@@ -156,41 +156,41 @@ import AgoraRtcKit
     var chorusChannelToken: String
     var maxCacheSize: Int = 10
     var musicType: loadMusicType = .mcc
-    var isDebugMode: Bool = false
     var audienceChannelToken: String = ""
     var musicStreamUid: Int = 0
     var musicChannelToken: String = ""
     var topN: Int = 0
+    var isDebugMode: Bool = false
     @objc public
     init(appId: String,
          rtmToken: String,
          engine: AgoraRtcEngineKit,
-         channelName: String,
          localUid: Int,
+         audienceChannelName: String,
+         audienceChannelToken: String,
          chorusChannelName: String,
          chorusChannelToken: String,
-         maxCacheSize: Int,
-         musicType: loadMusicType,
-         isDebugMode: Bool,
-         audienceChannelToken: String,
          musicStreamUid: Int,
          musicChannelToken: String,
-         topN: Int
+         maxCacheSize: Int,
+         musicType: loadMusicType,
+         topN: Int,
+         isDebugMode: Bool
     ) {
         self.appId = appId
         self.rtmToken = rtmToken
         self.engine = engine
-        self.channelName = channelName
+        self.channelName = audienceChannelName
         self.localUid = localUid
         self.chorusChannelName = chorusChannelName
         self.chorusChannelToken = chorusChannelToken
         self.maxCacheSize = maxCacheSize
         self.musicType = musicType
-        self.isDebugMode = isDebugMode
         self.audienceChannelToken = audienceChannelToken
         self.musicStreamUid = musicStreamUid
         self.musicChannelToken = musicChannelToken
         self.topN = topN
+        self.isDebugMode = isDebugMode
     }
 }
 
@@ -215,8 +215,8 @@ import AgoraRtcKit
          chorusChannelName: String,
          chorusChannelToken: String,
          type: KTVType,
-         maxCacheSize: Int,
          musicType: loadMusicType,
+         maxCacheSize: Int,
          isDebugMode: Bool
     ) {
         self.appId = appId
