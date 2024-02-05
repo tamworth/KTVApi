@@ -8,7 +8,7 @@
 import UIKit
 import AgoraLyricsScore
 class KTVLyricView: UIView {
-    var downloadManager = AgoraDownLoadManager()
+    var downloadManager = LyricsFileDownloader()
     var lrcView: KaraokeView!
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -25,7 +25,7 @@ class KTVLyricView: UIView {
         lrcView.scoringView.viewHeight = 60
         lrcView.scoringView.topSpaces = 5
         lrcView.backgroundColor = .lightGray
-        lrcView.lyricsView.textNormalColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
+        lrcView.lyricsView.inactiveLineTextColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
        // lrcView.lyricsView.textHighlightedColor = UIColor(hex: "#EEFF25")
         lrcView.lyricsView.lyricLineSpacing = 6
         lrcView.lyricsView.draggable = false
@@ -46,34 +46,7 @@ extension KTVLyricView: KTVLrcViewDelegate, KaraokeDelegate {
     
     func onDownloadLrcData(url: String) {
         //开始歌词下载
-        startDownloadLrc(with: url) {[weak self] url in
-            guard let self = self, let url = url else {return}
-            self.resetLrcData(with: url)
-        }
-    }
-    
-    func startDownloadLrc(with url: String, callBack: @escaping LyricCallback) {
-        var path: String? = nil
-        downloadManager.downloadLrcFile(urlString: url) { lrcurl in
-            defer {
-                callBack(path)
-            }
-            guard let lrcurl = lrcurl else {
-                print("downloadLrcFile fail, lrcurl is nil")
-                return
-            }
-
-            let curSong = URL(string: url)?.lastPathComponent.components(separatedBy: ".").first
-            let loadSong = URL(string: lrcurl)?.lastPathComponent.components(separatedBy: ".").first
-            guard curSong == loadSong else {
-                print("downloadLrcFile fail, missmatch, cur:\(curSong ?? "") load:\(loadSong ?? "")")
-                return
-            }
-            path = lrcurl
-        } failure: {
-            callBack(nil)
-            print("歌词解析失败")
-        }
+        let _ = downloadManager.download(urlString: url)
     }
     
     func resetLrcData(with url: String) {
@@ -90,12 +63,15 @@ extension KTVLyricView: KTVLrcViewDelegate, KaraokeDelegate {
     }
 }
 
-extension KTVLyricView: AgoraLrcDownloadDelegate {
-    public func downloadLrcFinished(url: String) {
-        print("download lrc finished \(url)")
+extension KTVLyricView: LyricsFileDownloaderDelegate {
+    func onLyricsFileDownloadProgress(requestId: Int, progress: Float) {
+        
     }
     
-    public func downloadLrcError(url: String, error: Error?) {
-        print("download lrc fail \(url): \(String(describing: error))")
+    func onLyricsFileDownloadCompleted(requestId: Int, fileData: Data?, error: DownloadError?) {
+        guard let data = fileData, let model = KaraokeView.parseLyricData(data: data) else {
+            return
+        }
+        lrcView?.setLyricData(data: model)
     }
 }

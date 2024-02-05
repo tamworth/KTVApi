@@ -55,7 +55,7 @@ class NetworkManager:NSObject {
 
     @objc static let shared = NetworkManager()
     private let baseUrl = "https://agoraktv.xyz/1.1/functions/"
-    private let baseServerUrl: String = "https://toolbox.bj2.agoralab.co/v1/"
+    private let baseServerUrl: String = "https://service.shengwang.cn/toolbox/v2/"
     
     private func basicAuth(key: String, password: String) -> String {
         let loginString = String(format: "%@:%@", key, password)
