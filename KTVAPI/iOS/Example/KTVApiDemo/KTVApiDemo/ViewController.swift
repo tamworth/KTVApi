@@ -15,6 +15,8 @@ class ViewController: UIViewController {
     var rtmToken: String?
     var rtcPlayerToken: String?
     var userId: Int = 0
+    var selBtn: UIButton?
+    var isCantata: Bool = false
     @IBOutlet weak var tf: UITextField!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,19 +26,28 @@ class ViewController: UIViewController {
     
     @IBAction func leadSet(_ sender: UIButton) {
         role = .leadSinger
+        if self.selBtn != nil {
+            self.selBtn?.setTitleColor(.white, for: .normal)
+        }
+        sender.setTitleColor(.red, for: .normal)
+        self.selBtn = sender
     }
-    
-    @IBAction func coSet(_ sender: Any) {
-        role = .coSinger
-    }
-    
-    
-    @IBAction func auSet(_ sender: Any) {
+ 
+    @IBAction func auSet(_ sender: UIButton) {
         role = .audience
+        if self.selBtn != nil {
+            self.selBtn?.setTitleColor(.white, for: .normal)
+        }
+        sender.setTitleColor(.red, for: .normal)
+        self.selBtn = sender
     }
     
     @IBAction func valueChange(_ sender: UISegmentedControl) {
         type = sender.selectedSegmentIndex == 0 ? .mcc : .local
+    }
+    
+    @IBAction func ktvTypeChange(_ sender: UISegmentedControl) {
+        isCantata = sender.selectedSegmentIndex == 0 ? false : true
     }
     
     @IBAction func startSing(_ sender: UIButton) {
@@ -48,6 +59,7 @@ class ViewController: UIViewController {
         let vc = KTVViewController()
         vc.role = role
         vc.type = type
+        vc.isCantata = isCantata
         vc.channelName = channelName
         self.navigationController?.pushViewController(vc, animated: true)
     }

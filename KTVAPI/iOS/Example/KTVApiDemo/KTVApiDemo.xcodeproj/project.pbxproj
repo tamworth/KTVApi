@@ -7,7 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E3CB4D602A935EBD00322389 /* 成都.xml in Resources */ = {isa = PBXBuildFile; fileRef = E3CB4D5F2A935EBD00322389 /* 成都.xml */; };
+		E38BDE782B6F7A78007A2834 /* KTVGiantChorusApiImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E38BDE772B6F7A77007A2834 /* KTVGiantChorusApiImpl.swift */; };
+		E38BDE7A2B6F7ABD007A2834 /* ApiManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E38BDE792B6F7ABD007A2834 /* ApiManager.swift */; };
+		E39BAF762B6CC695002C692F /* LrcTime.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = E39BAF742B6CC695002C692F /* LrcTime.pb.swift */; };
+		E39BAF772B6CC695002C692F /* LrcTime.proto in Sources */ = {isa = PBXBuildFile; fileRef = E39BAF752B6CC695002C692F /* LrcTime.proto */; };
+		E39BAF792B6CCC65002C692F /* 不如跳舞.xml in Resources */ = {isa = PBXBuildFile; fileRef = E39BAF782B6CCC65002C692F /* 不如跳舞.xml */; };
+		E39BAF7B2B6CCC74002C692F /* 不如跳舞.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E39BAF7A2B6CCC74002C692F /* 不如跳舞.mp4 */; };
 		E3ED270B2A822E9D0087B7AA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED270A2A822E9D0087B7AA /* AppDelegate.swift */; };
 		E3ED270D2A822E9D0087B7AA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED270C2A822E9D0087B7AA /* SceneDelegate.swift */; };
 		E3ED270F2A822E9D0087B7AA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED270E2A822E9D0087B7AA /* ViewController.swift */; };
@@ -28,7 +33,6 @@
 		E3ED27392A8312120087B7AA /* AgoraStringExtention.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED27312A8312120087B7AA /* AgoraStringExtention.swift */; };
 		E3ED273A2A8312120087B7AA /* AgoraURLExtention.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED27322A8312120087B7AA /* AgoraURLExtention.swift */; };
 		E3ED273B2A8312120087B7AA /* AgoraDownLoadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED27332A8312120087B7AA /* AgoraDownLoadManager.swift */; };
-		E3FE65332B20638D001D6BF9 /* 成都.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E3FE65322B20638D001D6BF9 /* 成都.mp3 */; };
 		F33427D772BC45C43FBC8F23 /* Pods_KTVApiDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AFBE8E6CA2314F17EF33468 /* Pods_KTVApiDemo.framework */; };
 /* End PBXBuildFile section */
 
@@ -36,7 +40,12 @@
 		0AFBE8E6CA2314F17EF33468 /* Pods_KTVApiDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KTVApiDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		91649F2302F7D5A73F303630 /* Pods-KTVApiDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KTVApiDemo.release.xcconfig"; path = "Target Support Files/Pods-KTVApiDemo/Pods-KTVApiDemo.release.xcconfig"; sourceTree = "<group>"; };
 		AFA8596CCA93FAF74AD1D2D5 /* Pods-KTVApiDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KTVApiDemo.debug.xcconfig"; path = "Target Support Files/Pods-KTVApiDemo/Pods-KTVApiDemo.debug.xcconfig"; sourceTree = "<group>"; };
-		E3CB4D5F2A935EBD00322389 /* 成都.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "成都.xml"; sourceTree = "<group>"; };
+		E38BDE772B6F7A77007A2834 /* KTVGiantChorusApiImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KTVGiantChorusApiImpl.swift; sourceTree = "<group>"; };
+		E38BDE792B6F7ABD007A2834 /* ApiManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiManager.swift; sourceTree = "<group>"; };
+		E39BAF742B6CC695002C692F /* LrcTime.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LrcTime.pb.swift; sourceTree = "<group>"; };
+		E39BAF752B6CC695002C692F /* LrcTime.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.protobuf; path = LrcTime.proto; sourceTree = "<group>"; };
+		E39BAF782B6CCC65002C692F /* 不如跳舞.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "不如跳舞.xml"; sourceTree = "<group>"; };
+		E39BAF7A2B6CCC74002C692F /* 不如跳舞.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "不如跳舞.mp4"; sourceTree = "<group>"; };
 		E3ED27072A822E9D0087B7AA /* KTVApiDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KTVApiDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E3ED270A2A822E9D0087B7AA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E3ED270C2A822E9D0087B7AA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -59,7 +68,6 @@
 		E3ED27312A8312120087B7AA /* AgoraStringExtention.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraStringExtention.swift; sourceTree = "<group>"; };
 		E3ED27322A8312120087B7AA /* AgoraURLExtention.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraURLExtention.swift; sourceTree = "<group>"; };
 		E3ED27332A8312120087B7AA /* AgoraDownLoadManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgoraDownLoadManager.swift; sourceTree = "<group>"; };
-		E3FE65322B20638D001D6BF9 /* 成都.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "成都.mp3"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,9 +123,9 @@
 				E3ED27232A8230A00087B7AA /* KeyCenter.swift */,
 				E3ED270A2A822E9D0087B7AA /* AppDelegate.swift */,
 				E3ED270C2A822E9D0087B7AA /* SceneDelegate.swift */,
-				E3CB4D5F2A935EBD00322389 /* 成都.xml */,
-				E3FE65322B20638D001D6BF9 /* 成都.mp3 */,
 				E3ED270E2A822E9D0087B7AA /* ViewController.swift */,
+				E39BAF782B6CCC65002C692F /* 不如跳舞.xml */,
+				E39BAF7A2B6CCC74002C692F /* 不如跳舞.mp4 */,
 				E3ED27252A8236750087B7AA /* KTVViewController.swift */,
 				E3ED27292A826B0D0087B7AA /* KTVLyricView.swift */,
 				E3ED272B2A8312120087B7AA /* FileDownloadCache */,
@@ -136,6 +144,10 @@
 			children = (
 				E3ED271F2A822ED30087B7AA /* KTVApiImpl.swift */,
 				E3ED27202A822ED30087B7AA /* KTVApi.swift */,
+				E38BDE772B6F7A77007A2834 /* KTVGiantChorusApiImpl.swift */,
+				E38BDE792B6F7ABD007A2834 /* ApiManager.swift */,
+				E39BAF742B6CC695002C692F /* LrcTime.pb.swift */,
+				E39BAF752B6CC695002C692F /* LrcTime.proto */,
 			);
 			path = KTVAPI;
 			sourceTree = "<group>";
@@ -217,9 +229,9 @@
 			files = (
 				E3ED27172A822E9E0087B7AA /* LaunchScreen.storyboard in Resources */,
 				E3ED27142A822E9E0087B7AA /* Assets.xcassets in Resources */,
-				E3FE65332B20638D001D6BF9 /* 成都.mp3 in Resources */,
-				E3CB4D602A935EBD00322389 /* 成都.xml in Resources */,
 				E3ED27122A822E9D0087B7AA /* Main.storyboard in Resources */,
+				E39BAF7B2B6CCC74002C692F /* 不如跳舞.mp4 in Resources */,
+				E39BAF792B6CCC65002C692F /* 不如跳舞.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,11 +287,14 @@
 				E3ED27392A8312120087B7AA /* AgoraStringExtention.swift in Sources */,
 				E3ED273B2A8312120087B7AA /* AgoraDownLoadManager.swift in Sources */,
 				E3ED27212A822ED30087B7AA /* KTVApiImpl.swift in Sources */,
+				E39BAF772B6CC695002C692F /* LrcTime.proto in Sources */,
 				E3ED27222A822ED30087B7AA /* KTVApi.swift in Sources */,
 				E3ED270F2A822E9D0087B7AA /* ViewController.swift in Sources */,
 				E3ED270B2A822E9D0087B7AA /* AppDelegate.swift in Sources */,
 				E3ED27342A8312120087B7AA /* AgoraMiguXmlLrcParse.swift in Sources */,
+				E39BAF762B6CC695002C692F /* LrcTime.pb.swift in Sources */,
 				E3ED27282A8243480087B7AA /* NetworkManager.swift in Sources */,
+				E38BDE7A2B6F7ABD007A2834 /* ApiManager.swift in Sources */,
 				E3ED27242A8230A00087B7AA /* KeyCenter.swift in Sources */,
 				E3ED27382A8312120087B7AA /* AgoraCacheFileHandle.swift in Sources */,
 				E3ED272A2A826B0D0087B7AA /* KTVLyricView.swift in Sources */,
@@ -288,6 +303,7 @@
 				E3ED27352A8312120087B7AA /* AgoraLrcParse.swift in Sources */,
 				E3ED273A2A8312120087B7AA /* AgoraURLExtention.swift in Sources */,
 				E3ED27372A8312120087B7AA /* AgoraLrcModel.swift in Sources */,
+				E38BDE782B6F7A78007A2834 /* KTVGiantChorusApiImpl.swift in Sources */,
 				E3ED27362A8312120087B7AA /* AgoraRequestTask.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
