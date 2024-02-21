@@ -162,7 +162,7 @@ class KTVGiantChorusApiImpl(
             contentCenterConfiguration.token = giantChorusApiConfig.rtmToken
             contentCenterConfiguration.maxCacheSize = giantChorusApiConfig.maxCacheSize
             if (KTVApi.debugMode) {
-                contentCenterConfiguration.mccDomain = "api-test.agora.io"
+                contentCenterConfiguration.mccDomain = KTVApi.mccDomain
             }
             mMusicCenter = IAgoraMusicContentCenter.create(mRtcEngine)
             mMusicCenter.initialize(contentCenterConfiguration)
@@ -314,14 +314,14 @@ class KTVGiantChorusApiImpl(
                 mRtcEngine.setParameters("{\"che.audio.agc.enable\": false}")
                 mRtcEngine.setParameters("{\"che.audio.ans.enable\": false}")
                 mRtcEngine.setParameters("{\"che.audio.md.enable\": false}")
-                mRtcEngine.setAudioProfile(5) // AgoraAudioProfileMusicHighQualityStereo
+                mRtcEngine.setAudioProfile(AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO) // AgoraAudioProfileMusicHighQualityStereo
             } else {
                 // 非耳机 开启3A 关闭md
                 mRtcEngine.setParameters("{\"che.audio.aec.enable\": true}")
                 mRtcEngine.setParameters("{\"che.audio.agc.enable\": true}")
                 mRtcEngine.setParameters("{\"che.audio.ans.enable\": true}")
                 mRtcEngine.setParameters("{\"che.audio.md.enable\": false}")
-                mRtcEngine.setAudioProfile(5) // AgoraAudioProfileMusicHighQualityStereo
+                mRtcEngine.setAudioProfile(AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO) // AgoraAudioProfileMusicHighQualityStereo
             }
         } else {
             // 非专业 开启3A 关闭md
@@ -329,7 +329,7 @@ class KTVGiantChorusApiImpl(
             mRtcEngine.setParameters("{\"che.audio.agc.enable\": true}")
             mRtcEngine.setParameters("{\"che.audio.ans.enable\": true}")
             mRtcEngine.setParameters("{\"che.audio.md.enable\": false}")
-            mRtcEngine.setAudioProfile(3) // AgoraAudioProfileMusicStandardStereo
+            mRtcEngine.setAudioProfile(AUDIO_PROFILE_MUSIC_STANDARD_STEREO) // AgoraAudioProfileMusicStandardStereo
         }
     }
 

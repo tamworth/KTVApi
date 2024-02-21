@@ -104,7 +104,9 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                     ktvApi.switchSingerRole(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
                         override fun onSwitchRoleSuccess() {
                             mainHandler.post {
-                                toast("加入合唱成功")
+                                toast("加入合唱成功，自动开麦")
+                                ktvApi.muteMic(false)
+                                btMicStatus.text = "麦克风开"
                                 tvSinger.text = getString(R.string.app_co_singer)
                                 KeyCenter.role = KTVSingRole.CoSinger
                             }

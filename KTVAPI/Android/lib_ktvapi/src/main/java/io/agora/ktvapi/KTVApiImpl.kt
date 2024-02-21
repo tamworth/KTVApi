@@ -174,6 +174,7 @@ class KTVApiImpl(
         if (ktvApiConfig.type == KTVType.SingRelay) {
             KTVApi.remoteVolume = 100
         }
+        mPlayer.setPlayerOption("play_pos_change_callback", 100)
     }
 
     // 数据上报
@@ -187,10 +188,12 @@ class KTVApiImpl(
             0)
     }
 
+    // 日志输出
     private fun ktvApiLog(msg: String) {
         Logging.i(tag, msg)
     }
 
+    // 日志输出
     private fun ktvApiLogError(msg: String) {
         Logging.e(tag, msg)
     }
@@ -297,6 +300,7 @@ class KTVApiImpl(
         processAudioProfessionalProfile()
     }
 
+    // 专业模式
     private fun processAudioProfessionalProfile() {
         ktvApiLog("processAudioProfessionalProfile: audioRouting: $audioRouting, professionalModeOpen: $professionalModeOpen， isPublishAudio：$isPublishAudio")
         if (!isPublishAudio) return // 必须为麦上者
@@ -308,14 +312,14 @@ class KTVApiImpl(
                 mRtcEngine.setParameters("{\"che.audio.agc.enable\": false}")
                 mRtcEngine.setParameters("{\"che.audio.ans.enable\": false}")
                 mRtcEngine.setParameters("{\"che.audio.md.enable\": false}")
-                mRtcEngine.setAudioProfile(5) // AgoraAudioProfileMusicHighQualityStereo
+                mRtcEngine.setAudioProfile(AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO) // AgoraAudioProfileMusicHighQualityStereo
             } else {
                 // 非耳机 开启3A 关闭md
                 mRtcEngine.setParameters("{\"che.audio.aec.enable\": true}")
                 mRtcEngine.setParameters("{\"che.audio.agc.enable\": true}")
                 mRtcEngine.setParameters("{\"che.audio.ans.enable\": true}")
                 mRtcEngine.setParameters("{\"che.audio.md.enable\": false}")
-                mRtcEngine.setAudioProfile(5) // AgoraAudioProfileMusicHighQualityStereo
+                mRtcEngine.setAudioProfile(AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO) // AgoraAudioProfileMusicHighQualityStereo
             }
         } else {
             // 非专业 开启3A 关闭md
@@ -323,7 +327,7 @@ class KTVApiImpl(
             mRtcEngine.setParameters("{\"che.audio.agc.enable\": true}")
             mRtcEngine.setParameters("{\"che.audio.ans.enable\": true}")
             mRtcEngine.setParameters("{\"che.audio.md.enable\": false}")
-            mRtcEngine.setAudioProfile(3) // AgoraAudioProfileMusicStandardStereo
+            mRtcEngine.setAudioProfile(AUDIO_PROFILE_MUSIC_STANDARD_STEREO) // AgoraAudioProfileMusicStandardStereo
         }
     }
 
@@ -398,12 +402,14 @@ class KTVApiImpl(
         val oldRole = singerRole
 
         // 调整开关麦状态
-        if ((oldRole == KTVSingRole.LeadSinger || oldRole == KTVSingRole.SoloSinger) && (newRole == KTVSingRole.CoSinger || newRole == KTVSingRole.Audience) && !isOnMicOpen) {
-            mRtcEngine.muteLocalAudioStream(true)
-            mRtcEngine.adjustRecordingSignalVolume(100)
-        } else if ((oldRole == KTVSingRole.Audience || oldRole == KTVSingRole.CoSinger) && (newRole == KTVSingRole.LeadSinger || newRole == KTVSingRole.SoloSinger) && !isOnMicOpen) {
-            mRtcEngine.adjustRecordingSignalVolume(0)
-            mRtcEngine.muteLocalAudioStream(false)
+        if (ktvApiConfig.type != KTVType.SingRelay) {
+            if ((oldRole == KTVSingRole.LeadSinger || oldRole == KTVSingRole.SoloSinger) && (newRole == KTVSingRole.CoSinger || newRole == KTVSingRole.Audience) && !isOnMicOpen) {
+                mRtcEngine.muteLocalAudioStream(true)
+                mRtcEngine.adjustRecordingSignalVolume(100)
+            } else if ((oldRole == KTVSingRole.Audience || oldRole == KTVSingRole.CoSinger) && (newRole == KTVSingRole.LeadSinger || newRole == KTVSingRole.SoloSinger) && !isOnMicOpen) {
+                mRtcEngine.adjustRecordingSignalVolume(0)
+                mRtcEngine.muteLocalAudioStream(false)
+            }
         }
 
         if (this.singerRole == KTVSingRole.Audience && newRole == KTVSingRole.SoloSinger) {
@@ -756,14 +762,18 @@ class KTVApiImpl(
     override fun muteMic(mute: Boolean) {
         reportCallScenarioApi("muteMic", JSONObject().put("mute", isOnMicOpen))
         this.isOnMicOpen = !mute
-        if (this.singerRole == KTVSingRole.SoloSinger || this.singerRole == KTVSingRole.LeadSinger) {
-            mRtcEngine.adjustRecordingSignalVolume(if (isOnMicOpen) 100 else 0)
+        if (ktvApiConfig.type != KTVType.SingRelay) {
+            if (this.singerRole == KTVSingRole.SoloSinger || this.singerRole == KTVSingRole.LeadSinger) {
+                mRtcEngine.adjustRecordingSignalVolume(if (isOnMicOpen) 100 else 0)
+            } else {
+                val channelMediaOption = ChannelMediaOptions()
+                channelMediaOption.publishMicrophoneTrack = isOnMicOpen
+                channelMediaOption.clientRoleType = CLIENT_ROLE_BROADCASTER
+                mRtcEngine.updateChannelMediaOptions(channelMediaOption)
+                mRtcEngine.muteLocalAudioStream(!isOnMicOpen)
+            }
         } else {
-            val channelMediaOption = ChannelMediaOptions()
-            channelMediaOption.publishMicrophoneTrack = isOnMicOpen
-            channelMediaOption.clientRoleType = CLIENT_ROLE_BROADCASTER
-            mRtcEngine.updateChannelMediaOptions(channelMediaOption)
-            mRtcEngine.muteLocalAudioStream(!isOnMicOpen)
+            mRtcEngine.adjustRecordingSignalVolume(if (isOnMicOpen) 100 else 0)
         }
     }
 

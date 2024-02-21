@@ -40,6 +40,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             btnLeadSinger.setOnClickListener {
                 resetRoleView()
                 KeyCenter.role = KTVSingRole.LeadSinger
+                KeyCenter.localUid = KeyCenter.LeadSingerUid
                 setRoleView()
             }
 
