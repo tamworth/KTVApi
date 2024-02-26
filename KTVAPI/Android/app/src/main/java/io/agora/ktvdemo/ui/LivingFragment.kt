@@ -302,8 +302,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                     musicStreamUid = 2023,
                     musicStreamToken = RtcEngineController.musicStreamToken,
                     maxCacheSize = 10,
-                    musicType = if (KeyCenter.isMcc) KTVMusicType.SONG_CODE else KTVMusicType.SONG_URL,
-                    topN = 6
+                    musicType = if (KeyCenter.isMcc) KTVMusicType.SONG_CODE else KTVMusicType.SONG_URL
                 )
             )
         }

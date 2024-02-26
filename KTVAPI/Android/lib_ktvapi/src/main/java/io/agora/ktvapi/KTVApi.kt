@@ -115,6 +115,30 @@ enum class AudioTrackMode(val value: Int) {
 }
 
 /**
+ * 大合唱中演唱者互相收听对方音频流的选路策略
+ * @param RANDOM 随机选取几条流
+ * @param BY_DELAY 根据延迟选择最低的几条流
+ * @param TOP_N 根据音强选流
+ * @param BY_DELAY_AND_TOP_N 同时开始延迟选路和音强选流
+ */
+enum class GiantChorusRouteSelectionType(val value: Int) {
+    RANDOM(0),
+    BY_DELAY(1),
+    TOP_N(2),
+    BY_DELAY_AND_TOP_N(3)
+}
+
+/**
+ * 大合唱中演唱者互相收听对方音频流的选路配置
+ * @param type 选路策略
+ * @param streamNum 最大选取的流个数（推荐6）
+ */
+data class GiantChorusRouteSelectionConfig constructor(
+   val type: GiantChorusRouteSelectionType,
+   val streamNum: Int
+)
+
+/**
  * 歌词组件接口，您setLrcView传入的歌词组件需要继承此接口类，并实现以下几个方法
  */
 interface ILrcView {
@@ -277,7 +301,7 @@ data class KTVApiConfig constructor(
  * @param musicStreamToken 音乐流token
  * @param maxCacheSize 最大缓存歌曲数
  * @param musicType 音乐类型
- * @param topN 演唱之间互相能听到的最大数量
+ * @param routeSelectionConfig 选路配置
  */
 data class KTVGiantChorusApiConfig constructor(
     val appId: String,
@@ -291,8 +315,7 @@ data class KTVGiantChorusApiConfig constructor(
     val musicStreamUid: Int,
     val musicStreamToken: String,
     val maxCacheSize: Int = 10,
-    val musicType: KTVMusicType = KTVMusicType.SONG_CODE,
-    val topN: Int = 0
+    val musicType: KTVMusicType = KTVMusicType.SONG_CODE
 )
 
 /**
@@ -336,6 +359,8 @@ interface KTVApi {
         var debugMode = false
         // 内部测试使用，无需关注
         var mccDomain = ""
+        // 大合唱的选路策略
+        var routeSelectionConfig = GiantChorusRouteSelectionConfig(GiantChorusRouteSelectionType.BY_DELAY, 6)
     }
 
     /**
