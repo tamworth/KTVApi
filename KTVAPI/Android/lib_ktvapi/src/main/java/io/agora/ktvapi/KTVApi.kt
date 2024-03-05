@@ -53,7 +53,8 @@ enum class KTVSingRole(val value: Int) {
 enum class KTVLoadMusicFailReason(val value: Int) {
     NO_LYRIC_URL(0),
     MUSIC_PRELOAD_FAIL(1),
-    CANCELED(2)
+    CANCELED(2),
+    GET_SIMPLE_INFO_FAIL(3)
 }
 
 /**
@@ -323,11 +324,13 @@ data class KTVGiantChorusApiConfig constructor(
  * @param songIdentifier 歌曲 id，通常由业务方给每首歌设置一个不同的SongId用于区分
  * @param mainSingerUid 主唱的 Uid，如果是伴唱，伴唱需要根据这个信息 mute 主频道主唱的声音
  * @param mode 歌曲加载的模式，默认为音乐和歌词均加载
+ * @param needPrelude 播放切片歌曲情况下，是否播放
  */
 data class KTVLoadMusicConfiguration(
     val songIdentifier: String,
     val mainSingerUid: Int,
-    val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
+    val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC,
+    val needPrelude: Boolean = false
 )
 
 /**
