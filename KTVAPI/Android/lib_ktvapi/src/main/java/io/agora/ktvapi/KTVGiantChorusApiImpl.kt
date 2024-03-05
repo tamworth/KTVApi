@@ -197,12 +197,14 @@ class KTVGiantChorusApiImpl(
             0)
     }
 
+    // 日志输出
     private fun ktvApiLog(msg: String) {
-        Logging.i(tag, msg)
+        Logging.i(KTVApiImpl.tag, "[GiantChorus] $msg")
     }
 
+    // 日志输出
     private fun ktvApiLogError(msg: String) {
-        Logging.e(tag, msg)
+        Logging.e(KTVApiImpl.tag, "[GiantChorus] $msg")
     }
 
     override fun renewInnerDataStreamId() {

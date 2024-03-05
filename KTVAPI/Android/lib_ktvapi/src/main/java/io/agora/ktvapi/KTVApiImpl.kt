@@ -194,12 +194,12 @@ class KTVApiImpl(
 
     // 日志输出
     private fun ktvApiLog(msg: String) {
-        Logging.i(tag, msg)
+        Logging.i(tag, "[${ktvApiConfig.type}] $msg")
     }
 
     // 日志输出
     private fun ktvApiLogError(msg: String) {
-        Logging.e(tag, msg)
+        Logging.e(tag, "[${ktvApiConfig.type}] $msg")
     }
 
     override fun renewInnerDataStreamId() {
