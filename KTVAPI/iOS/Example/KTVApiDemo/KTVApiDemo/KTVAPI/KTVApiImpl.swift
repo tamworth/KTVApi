@@ -51,6 +51,7 @@ fileprivate enum KTVSongMode: Int {
     private var startHighTime: Int = 0
     private var isRelease: Bool = false
     private var songUrl2: String = ""
+    private var enableMultipathing = true
     private var playerState: AgoraMediaPlayerState = .idle {
         didSet {
             agoraPrint("playerState did changed: \(oldValue.rawValue)->\(playerState.rawValue)")
@@ -96,6 +97,7 @@ fileprivate enum KTVSongMode: Int {
     private var isWearingHeadPhones: Bool = false
     private var enableProfessional: Bool = false
     private var isPublishAudio: Bool = false
+    private var preludeDuration: Int64 = 0
     private lazy var apiDelegateHandler = KTVApiRTCDelegateHandler(with: self)
     deinit {
         mcc?.register(nil)
@@ -116,9 +118,8 @@ fileprivate enum KTVSongMode: Int {
             contentCenterConfiguration.token = config.rtmToken
             contentCenterConfiguration.rtcEngine = config.engine
             contentCenterConfiguration.maxCacheSize = UInt(config.maxCacheSize)
-            if config.isDebugMode {
-                //如果这一块报错为contentCenterConfiguration没有mccDomain这个属性 说明该版本不支持这个 可以注释掉这行代码。完全不影响
-                contentCenterConfiguration.mccDomain = "api-test.agora.io"
+            if let domain = config.mccDomain {
+                contentCenterConfiguration.mccDomain = domain
             }
             mcc = AgoraMusicContentCenter.sharedContentCenter(config: contentCenterConfiguration)
             mcc?.register(self)
@@ -149,7 +150,6 @@ fileprivate enum KTVSongMode: Int {
         engine.setParameters("{\"che.audio.neteq.prebuffer_max_delay\": 600}")
         engine.setParameters("{\"che.audio.max_mixed_participants\": 8}")
         engine.setParameters("{\"che.audio.custom_bitrate\": 48000}")
-        engine.setParameters("{\"che.audio.direct.uplink_process\": false}")
         engine.setParameters("{\"che.audio.neteq.enable_stable_playout\":true}")
         engine.setParameters("{\"che.audio.neteq.targetlevel_offset\": 20}")
         engine.setParameters("{\"che.audio.ans.noise_gate\": 20}")
@@ -159,10 +159,11 @@ fileprivate enum KTVSongMode: Int {
         }
         
         //4.3.0 add
-        engine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
-        engine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
+        enableMultipathing = true
+//        engine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
+//        engine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
         engine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
-        engine.setParameters("{\"rtc.enableMultipath\": true}")
+       // engine.setParameters("{\"rtc.enableMultipath\": true}")
         
     }
     
@@ -201,7 +202,6 @@ extension KTVApiImpl {
 //            // 主唱自动播放歌曲
 //            if self.singerRole != .leadSinger {
 //                switchSingerRole(newRole: .soloSinger) { state, failRes in
-//                    
 //                }
 //            }
 //            startSing(url: url1, startPos: 0)
@@ -240,7 +240,6 @@ extension KTVApiImpl {
 //            // 主唱自动播放歌曲
 //            if singerRole != .leadSinger {
 //                switchSingerRole(newRole: .soloSinger) { _, _ in
-//                    
 //                }
 //            }
 //            startSing(url: url, startPos: 0)
@@ -332,12 +331,14 @@ extension KTVApiImpl {
         sendCustomMessage(with: "switchSingerRole", label: "oldRole:\(oldRole.rawValue), newRole: \(newRole.rawValue)")
         agoraPrint("switchSingerRole oldRole:\(oldRole.rawValue), newRole: \(newRole.rawValue)")
         
-        if ((oldRole == .leadSinger || oldRole == .soloSinger) && (newRole == .coSinger || newRole == .audience) && isNowMicMuted) {
-            apiConfig?.engine?.muteLocalAudioStream(true)
-            apiConfig?.engine?.adjustRecordingSignalVolume(100)
-        } else if ((oldRole == .audience || oldRole == .coSinger) && (newRole == .leadSinger || newRole == .soloSinger) && isNowMicMuted) {
-            apiConfig?.engine?.adjustRecordingSignalVolume(0)
-            apiConfig?.engine?.muteLocalAudioStream(false)
+        if (apiConfig?.type != .singRelay) {
+            if ((oldRole == .leadSinger || oldRole == .soloSinger) && (newRole == .coSinger || newRole == .audience) && isNowMicMuted) {
+                    apiConfig?.engine?.muteLocalAudioStream(true)
+                    apiConfig?.engine?.adjustRecordingSignalVolume(100)
+            } else if ((oldRole == .audience || oldRole == .coSinger) && (newRole == .leadSinger || newRole == .soloSinger) && isNowMicMuted) {
+                        apiConfig?.engine?.adjustRecordingSignalVolume(0)
+                        apiConfig?.engine?.muteLocalAudioStream(false)
+            }
         }
         
         self.switchSingerRole(oldRole: oldRole, newRole: newRole, token: apiConfig?.chorusChannelToken ?? "", stateCallBack: onSwitchRoleState)
@@ -388,10 +389,18 @@ extension KTVApiImpl {
     @objc public func muteMic(muteStatus: Bool) {
         sendCustomMessage(with: "setMicStatus", label: "\(muteStatus)")
         self.isNowMicMuted = muteStatus
-        if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
-            apiConfig?.engine?.adjustRecordingSignalVolume(muteStatus ? 0 : 100)
+        if (apiConfig?.type != .singRelay) {
+            if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
+                apiConfig?.engine?.adjustRecordingSignalVolume(muteStatus ? 0 : 100)
+            } else {
+                let channelMediaOptions = AgoraRtcChannelMediaOptions()
+                channelMediaOptions.publishMicrophoneTrack = !muteStatus
+                channelMediaOptions.clientRoleType = .broadcaster
+                apiConfig?.engine?.updateChannel(with: channelMediaOptions)
+                apiConfig?.engine?.muteLocalAudioStream(muteStatus)
+            }
         } else {
-            apiConfig?.engine?.muteLocalAudioStream(muteStatus)
+            apiConfig?.engine?.adjustRecordingSignalVolume(muteStatus ? 0 : 100)
         }
     }
     
@@ -400,6 +409,19 @@ extension KTVApiImpl {
         let ret: Int = mcc?.removeCache(songCode: songCode) ?? 0
         if ret < 0 {
             agoraPrint("removeMusic failed: ret:\(ret)")
+        }
+    }
+    
+    @objc public func enableMutipath(enable: Bool) {
+        sendCustomMessage(with: "enableMutipath", label: "enable:\(enable)")
+        agoraPrint("enableMutipath:\(enable)")
+        enableMultipathing = enable
+        if singerRole == .coSinger || singerRole == .leadSinger {
+            if let subChorusConnection = subChorusConnection {
+                let mediaOption = AgoraRtcChannelMediaOptions()
+                mediaOption.parameters = "{\"rtc.enableMultipath\": \(enable), \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}"
+                apiConfig?.engine?.updateChannelEx(with: mediaOption, connection: subChorusConnection)
+            }
         }
     }
 
@@ -624,6 +646,9 @@ extension KTVApiImpl {
         mediaOption.enableAudioRecordingOrPlayout = role != .leadSinger
         mediaOption.clientRoleType = .broadcaster
         mediaOption.parameters = "{\"rtc.use_audio4\": true}"
+        if enableMultipathing {
+            mediaOption.parameters = "{\"rtc.enableMultipath\": true, \"rtc.path_scheduling_strategy\": 0, \"rtc.remote_path_scheduling_strategy\": 0}"
+        }
 
         let rtcConnection = AgoraRtcConnection()
         rtcConnection.channelId = apiConfig?.chorusChannelName ?? ""
@@ -723,7 +748,6 @@ extension KTVApiImpl {
 //                    // 主唱自动播放歌曲
 //                    if self.singerRole != .leadSinger {
 //                        self.switchSingerRole(newRole: .soloSinger) { _, _ in
-//                            
 //                        }
 //                    }
 //                    self.startSing(songCode: self.songCode, startPos: 0)
@@ -764,7 +788,6 @@ extension KTVApiImpl {
 //                                // 主唱自动播放歌曲
 //                                if self.singerRole != .leadSinger {
 //                                    self.switchSingerRole(newRole: .soloSinger) { _, _ in
-//                                        
 //                                    }
 //                                }
 //                                self.startSing(songCode: self.songCode, startPos: 0)
@@ -776,7 +799,6 @@ extension KTVApiImpl {
 //                            // 主唱自动播放歌曲
 //                            if self.singerRole != .leadSinger {
 //                                self.switchSingerRole(newRole: .soloSinger) { _, _ in
-//                                    
 //                                }
 //                            }
 //                            self.startSing(songCode: self.songCode, startPos: 0)
@@ -1089,12 +1111,17 @@ extension KTVApiImpl {
             if self.singerRole == .audience && !recvFromDataStream {
                 
             } else {
+                var curTime:Int64 = Int64(current) + Int64(self.startHighTime)
+                if songConfig?.songCutter == true {
+                    curTime = curTime - preludeDuration > 0 ? curTime - preludeDuration : curTime
+                }
                 if self.singerRole != .audience {
                     current = Date().milListamp - self.lastReceivedPosition + Double(self.localPosition)
+                    
                     if self.singerRole == .leadSinger || self.singerRole == .soloSinger {
                         var time: LrcTime = LrcTime()
                         time.forward = true
-                        time.ts = Int64(current) + Int64(self.startHighTime)
+                        time.ts = curTime
                         time.songID = songIdentifier
                         time.type = .lrcTime
                         //大合唱的uid是musicuid
@@ -1102,7 +1129,7 @@ extension KTVApiImpl {
                         sendMetaMsg(with: time)
                     }
                 }
-                self.setProgress(with: Int(current) + Int(self.startHighTime))
+                self.setProgress(with: Int(curTime))
             }
             
             self.oldPitch = self.pitch
@@ -1368,6 +1395,9 @@ extension KTVApiImpl: AgoraMusicContentCenterEventDelegate {
                 let highPart = format["highPart"] as! [[String: Any]]
                 let highStartTime = highPart[0]["highStartTime"] as! Int
                 let highEndTime = highPart[0]["highEndTime"] as! Int
+                if highPart[0].keys.contains("preludeDuration") {
+                    self.preludeDuration = highPart[0]["preludeDuration"] as! Int64
+                }
                 let time = highStartTime
                 startHighTime = time
                 self.lrcControl?.onHighPartTime(highStartTime: highStartTime, highEndTime: highEndTime)
