@@ -19,8 +19,8 @@ class MyApplication : Application() {
         super.onCreate()
         sApp = this
         try {
-            initFile("成都.mp3")
-            initFile("成都.xml")
+            initFile("不如跳舞.mp4")
+            initFile("不如跳舞.xml")
         }catch (e:Exception){
             e.printStackTrace()
         }

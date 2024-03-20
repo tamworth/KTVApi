@@ -40,6 +40,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             btnLeadSinger.setOnClickListener {
                 resetRoleView()
                 KeyCenter.role = KTVSingRole.LeadSinger
+                KeyCenter.localUid = KeyCenter.LeadSingerUid
                 setRoleView()
             }
 
@@ -54,6 +55,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             // 选择加载歌曲的类型， MCC 声网歌曲中心或者本地歌曲
             groupSongType.setOnCheckedChangeListener { _, checkedId -> KeyCenter.isMcc = checkedId == R.id.rbtMccSong }
 
+            // 选择体验 KTVApi 的类型， 普通合唱或者大合唱
+            ktvApiType.setOnCheckedChangeListener { _, checkedId -> KeyCenter.isNormalChorus = checkedId == R.id.rbtNormalChorus}
+
             // 开始体验按钮
             btnStartChorus.setOnClickListener {
                 if (KeyCenter.channelId.isEmpty()){
@@ -62,7 +66,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                 }
                 RtcEngineController.eventListener = IChannelEventListener()
 
-                // 这里一共获取了三个 Token
+                // 这里一共获取了四个 Token
                 // 1、加入主频道使用的 Rtc Token
                 // 2、如果要使用 MCC 模块获取歌单、下载歌曲，需要 RTM Token 进行鉴权，如果您有自己的歌单就不需要获取该 token
                 // 3、合唱需要用到的合唱子频道 token，如果您只需要独唱就不需要获取该 token
@@ -76,21 +80,47 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     success = { ret ->
                         val rtcToken = ret[TokenGenerator.AgoraTokenType.rtc] ?: ""
                         val rtmToken = ret[TokenGenerator.AgoraTokenType.rtm] ?: ""
-                        TokenGenerator.generateToken("${KeyCenter.channelId}_ex", KeyCenter.localUid.toString(),
-                            TokenGenerator.TokenGeneratorType.token007, TokenGenerator.AgoraTokenType.rtc,
-                            success = { chorusToken ->
-                                RtcEngineController.rtcToken = rtcToken
-                                RtcEngineController.rtmToken = rtmToken
-                                RtcEngineController.chorusChannelRtcToken = chorusToken
-                                findNavController().navigate(R.id.action_mainFragment_to_livingFragment)
-                            },
-                            failure = {
-                                toast("获取 token 异常")
-                            }
-                        )
+
+                        if (KeyCenter.isNormalChorus) {
+                            TokenGenerator.generateToken("${KeyCenter.channelId}_ex", KeyCenter.localUid.toString(),
+                                TokenGenerator.TokenGeneratorType.token007, TokenGenerator.AgoraTokenType.rtc,
+                                success = { chorusToken ->
+                                    RtcEngineController.audienceChannelToken = rtcToken
+                                    RtcEngineController.rtmToken = rtmToken
+                                    RtcEngineController.chorusChannelRtcToken = chorusToken
+                                    findNavController().navigate(R.id.action_mainFragment_to_livingFragment)
+                                },
+                                failure = {
+                                    toast("获取 token 异常1")
+                                }
+                            )
+                        } else {
+                            TokenGenerator.generateToken("${KeyCenter.channelId}_ad", KeyCenter.localUid.toString(),
+                                TokenGenerator.TokenGeneratorType.token007, TokenGenerator.AgoraTokenType.rtc,
+                                success = { audienceToken ->
+                                    TokenGenerator.generateToken(KeyCenter.channelId, "2023",
+                                        TokenGenerator.TokenGeneratorType.token007, TokenGenerator.AgoraTokenType.rtc,
+                                        success = { musicToken ->
+                                            RtcEngineController.chorusChannelRtcToken = rtcToken
+                                            RtcEngineController.rtmToken = rtmToken
+                                            RtcEngineController.audienceChannelToken = audienceToken
+                                            RtcEngineController.musicStreamToken = musicToken
+                                            findNavController().navigate(R.id.action_mainFragment_to_livingFragment)
+                                        },
+                                        failure = {
+                                            toast("获取 token 异常2")
+                                        }
+                                    )
+                                },
+                                failure = {
+                                    toast("获取 token 异常3")
+                                }
+                            )
+                        }
+
                     },
                     failure = {
-                        toast("获取 token 异常")
+                        toast("获取 token 异常4")
                     }
                 )
             }

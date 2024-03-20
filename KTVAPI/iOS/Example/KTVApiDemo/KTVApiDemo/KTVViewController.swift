@@ -204,6 +204,7 @@ class KTVViewController: UIViewController {
                 self.rtcPlayerToken = rtcPlayerToken
                 
                 let apiConfig = KTVApiConfig(appId: KeyCenter.AppId, rtmToken: self.type == .mcc ? (self.rtmToken ?? "") : "", engine: self.rtcKit, channelName: self.channelName, localUid: self.userId, chorusChannelName: "\(self.channelName)_ex", chorusChannelToken: self.rtcPlayerToken ?? "", type: .normal, musicType: self.type == .mcc ? .mcc : .local, maxCacheSize: 10, mccDomain: nil)
+
                 self.ktvApi = KTVApiImpl()
                 self.ktvApi.createKtvApi?(config: apiConfig)
                 self.ktvApi.renewInnerDataStreamId()

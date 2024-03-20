@@ -87,6 +87,31 @@
             android:text="@string/app_local_music_tag" />
     </RadioGroup>
 
+    <RadioGroup
+        android:id="@+id/ktvApiType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/groupSongType">
+
+        <RadioButton
+            android:id="@+id/rbtNormalChorus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/app_normal_ktvapi_tag" />
+
+        <RadioButton
+            android:id="@+id/rbtGiantChorus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/app_giant_ktvapi_tag" />
+    </RadioGroup>
+
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnStartChorus"
@@ -98,5 +123,5 @@
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/groupSongType" />
+        app:layout_constraintTop_toBottomOf="@id/ktvApiType" />
 </androidx.constraintlayout.widget.ConstraintLayout>
