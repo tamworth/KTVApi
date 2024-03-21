@@ -3,7 +3,7 @@ PODS:
   - AgoraLyricsScore (1.1.6):
     - AgoraComponetLog
     - Zip
-  - AgoraRtcEngine_Special_iOS (4.1.1.26)
+  - AgoraRtcEngine_Special_iOS (4.1.1.27)
   - SVProgressHUD (2.3.1):
     - SVProgressHUD/Core (= 2.3.1)
   - SVProgressHUD/Core (2.3.1)
@@ -12,7 +12,7 @@ PODS:
 
 DEPENDENCIES:
   - AgoraLyricsScore (= 1.1.6)
-  - AgoraRtcEngine_Special_iOS (= 4.1.1.26)
+  - AgoraRtcEngine_Special_iOS (= 4.1.1.27)
   - SVProgressHUD
   - SwiftProtobuf
   - Zip
@@ -29,11 +29,11 @@ SPEC REPOS:
 SPEC CHECKSUMS:
   AgoraComponetLog: c52aec8db3ea38c5693fd4f1beee05ba7715e68b
   AgoraLyricsScore: 7576387b199cdc3b2752a113688abd0a807a2ca3
-  AgoraRtcEngine_Special_iOS: 62ac62b0caddac27ab3c2e26ed7a2e5d9c7739a5
+  AgoraRtcEngine_Special_iOS: 77a21e351df0cfc2b0ba89061e2a905e393abebe
   SVProgressHUD: 4837c74bdfe2e51e8821c397825996a8d7de6e22
   SwiftProtobuf: 407a385e97fd206c4fbe880cc84123989167e0d1
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
 
-PODFILE CHECKSUM: f657776b49bc0f7bced82e0c5419ddc7ded5b58d
+PODFILE CHECKSUM: 78217ea016b78e9a07e6bbd001e85c0be288c2ff
 
 COCOAPODS: 1.14.3

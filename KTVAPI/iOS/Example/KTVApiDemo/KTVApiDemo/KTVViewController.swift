@@ -180,9 +180,10 @@ class KTVViewController: UIViewController {
                 self.rtmToken = rtmToken
                 self.rtcPlayerToken = rtcPlayerToken
 
-                let giantCOnfig = GiantChorusConfiguration(appId: KeyCenter.AppId, rtmToken: rtmToken ?? "", engine: rtcKit, channelName: "\(channelName)_ad", localUid: self.userId, chorusChannelName: "\(channelName)", chorusChannelToken: rtcToken ?? "",  maxCacheSize: 10, musicType: self.type == .mcc ? .mcc : .local, isDebugMode: false, audienceChannelToken: audienceToken ?? "", musicStreamUid: 2023, musicChannelToken: rtcPlayerToken ?? "", topN: 6)
+                let giantConfig = GiantChorusConfiguration(appId: KeyCenter.AppId, rtmToken: rtmToken ?? "", engine: rtcKit, localUid: self.userId, audienceChannelName: "\(channelName)_ad", audienceChannelToken: audienceToken ?? "", chorusChannelName: "\(channelName)", chorusChannelToken: rtcToken ?? "", musicStreamUid: 2023, musicChannelToken: rtcPlayerToken ?? "", maxCacheSize: 10, musicType: self.type == .mcc ? .mcc : .local, routeSelectionConfig: GiantChorusRouteSelectionConfig(type: .byDelay, streamNum: 6), mccDomain: nil)
+                
                 self.ktvApi = KTVGiantChorusApiImpl()
-                self.ktvApi.createKTVGiantChorusApi?(config: giantCOnfig)
+                self.ktvApi.createKTVGiantChorusApi?(config: giantConfig)
                 self.ktvApi.renewInnerDataStreamId()
                 self.ktvApi.setLrcView(view: self.lyricView)
 
@@ -202,7 +203,8 @@ class KTVViewController: UIViewController {
                 self.rtmToken = rtmToken
                 self.rtcPlayerToken = rtcPlayerToken
                 
-                let apiConfig = KTVApiConfig(appId: KeyCenter.AppId, rtmToken: self.type == .mcc ? (self.rtmToken ?? "") : "", engine: self.rtcKit, channelName: self.channelName, localUid: self.userId, chorusChannelName: "\(self.channelName)_ex", chorusChannelToken: self.rtcPlayerToken ?? "", type: .normal, maxCacheSize: 10, musicType: self.type == .mcc ? .mcc : .local, isDebugMode: false)
+                let apiConfig = KTVApiConfig(appId: KeyCenter.AppId, rtmToken: self.type == .mcc ? (self.rtmToken ?? "") : "", engine: self.rtcKit, channelName: self.channelName, localUid: self.userId, chorusChannelName: "\(self.channelName)_ex", chorusChannelToken: self.rtcPlayerToken ?? "", type: .normal, musicType: self.type == .mcc ? .mcc : .local, maxCacheSize: 10, mccDomain: nil)
+
                 self.ktvApi = KTVApiImpl()
                 self.ktvApi.createKtvApi?(config: apiConfig)
                 self.ktvApi.renewInnerDataStreamId()
