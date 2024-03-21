@@ -22,9 +22,10 @@ class KTVGiantChorusApiImpl(
 
     companion object {
         private val scheduledThreadPool: ScheduledExecutorService = Executors.newScheduledThreadPool(5)
-        const val tag = "KTV_API_LOG"
-        const val version = "1_android_4.3.0"
-        const val lyricSyncVersion = 2
+        private const val tag = "KTV_API_LOG_GIANT"
+        private const val messageId = "agora:scenarioAPI"
+        private const val version = "1_android_4.3.0"
+        private const val lyricSyncVersion = 2
     }
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
@@ -190,7 +191,7 @@ class KTVGiantChorusApiImpl(
     // 数据上报
     private fun reportCallScenarioApi(event: String, params: JSONObject) {
         mRtcEngine.sendCustomReportMessage(
-            "scenarioAPI",
+            messageId,
             version,
             event,
             params.toString(),
@@ -199,12 +200,12 @@ class KTVGiantChorusApiImpl(
 
     // 日志输出
     private fun ktvApiLog(msg: String) {
-        Logging.i(KTVApiImpl.tag, "[GiantChorus] $msg")
+        Logging.i(tag, "[GiantChorus] $msg")
     }
 
     // 日志输出
     private fun ktvApiLogError(msg: String) {
-        Logging.e(KTVApiImpl.tag, "[GiantChorus] $msg")
+        Logging.e(tag, "[GiantChorus] $msg")
     }
 
     override fun renewInnerDataStreamId() {
@@ -251,6 +252,9 @@ class KTVGiantChorusApiImpl(
         mRtcEngine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
         //mRtcEngine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
         //mRtcEngine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
+
+        // 数据上报
+        mRtcEngine.setParameters("{\"rtc.direct_send_custom_event\": true}")
     }
 
     override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {

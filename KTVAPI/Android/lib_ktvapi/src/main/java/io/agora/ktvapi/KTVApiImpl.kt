@@ -22,9 +22,10 @@ class KTVApiImpl(
 
     companion object {
         private val scheduledThreadPool: ScheduledExecutorService = Executors.newScheduledThreadPool(5)
-        const val tag = "KTV_API_LOG"
-        const val version = "1_android_4.3.0"
-        const val lyricSyncVersion = 2
+        private const val tag = "KTV_API_LOG"
+        private const val messageId = "agora:scenarioAPI"
+        private const val version = "1_android_4.3.0"
+        private const val lyricSyncVersion = 2
     }
 
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
@@ -185,7 +186,7 @@ class KTVApiImpl(
     private fun reportCallScenarioApi(event: String, params: JSONObject) {
         ktvApiLog("event: $event, params:$params")
         mRtcEngine.sendCustomReportMessage(
-            "scenarioAPI",
+            messageId,
             version,
             event,
             params.toString(),
@@ -251,6 +252,9 @@ class KTVApiImpl(
         mRtcEngine.setParameters("{\"rtc.enable_tds_request_on_join\": true}")
         //mRtcEngine.setParameters("{\"rtc.remote_path_scheduling_strategy\": 0}")
         //mRtcEngine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
+
+        // 数据上报
+        mRtcEngine.setParameters("{\"rtc.direct_send_custom_event\": true}")
     }
 
     override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
