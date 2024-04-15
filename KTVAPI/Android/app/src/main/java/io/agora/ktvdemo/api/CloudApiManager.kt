@@ -25,8 +25,8 @@ class CloudApiManager private constructor() {
             return InstanceHolder.apiManager
         }
 
-        private const val testIp = "218.205.37.50"
-        private const val domain = "http://218.205.37.50:16000"
+        //private const val testIp = "218.205.37.50"
+        private const val domain = "https://api.sd-rtn.com"
         private const val TAG = "ApiManager"
         private const val cloudRtcUid = 20232023
     }
@@ -54,7 +54,7 @@ class CloudApiManager private constructor() {
         try {
             val acquireOjb = JSONObject()
             acquireOjb.put("instanceId", System.currentTimeMillis().toString() + "")
-            acquireOjb.put("testIp", testIp)
+            //acquireOjb.put("testIp", testIp)
             val request: Request = Builder()
                 .url(getTokenUrl(domain, BuildConfig.AGORA_APP_ID))
                 .addHeader("Content-Type", "application/json")
@@ -188,7 +188,7 @@ class CloudApiManager private constructor() {
     private val basicAuth: String
         private get() {
             // 拼接客户 ID 和客户密钥并使用 base64 编码
-            val plainCredentials = BuildConfig.AGORA_APP_ID + ":" + BuildConfig.AGORA_APP_CERTIFICATE
+            val plainCredentials = BuildConfig.RESTFUL_API_KEY + ":" + BuildConfig.RESTFUL_API_SECRET
             var base64Credentials: String? = null
             base64Credentials = String(Base64.getEncoder().encode(plainCredentials.toByteArray()))
             // 创建 authorization header
