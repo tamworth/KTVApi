@@ -8,6 +8,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
 import io.agora.ktvapi.KTVSingRole
+import io.agora.ktvdemo.BuildConfig
 import io.agora.ktvdemo.rtc.IChannelEventListener
 import io.agora.ktvdemo.R
 import io.agora.ktvdemo.rtc.RtcEngineController
@@ -60,6 +61,14 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
             // 开始体验按钮
             btnStartChorus.setOnClickListener {
+                if (BuildConfig.AGORA_APP_ID.isEmpty()) {
+                    toast(getString(R.string.app_appid_check))
+                    return@setOnClickListener
+                }
+                if (!KeyCenter.isNormalChorus && BuildConfig.RESTFUL_API_KEY.isEmpty()) {
+                    toast(getString(R.string.app_restful_check))
+                    return@setOnClickListener
+                }
                 if (KeyCenter.channelId.isEmpty()){
                     toast(getString(R.string.app_input_channel_name))
                     return@setOnClickListener
