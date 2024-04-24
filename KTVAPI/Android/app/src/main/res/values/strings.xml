@@ -21,4 +21,6 @@
     <string name="app_normal_ktvapi_tag">独唱、小合唱</string>
     <string name="app_giant_ktvapi_tag">大合唱</string>
     <string name="app_start_enjoy_tag">开始体验</string>
+    <string name="app_appid_check">请检查 gradle.properties 文件内 APPID APP 证书是否正确填写</string>
+    <string name="app_restful_check">请检查 gradle.properties 文件内 RESTFUL API KEY 是否正确填写</string>
 </resources>

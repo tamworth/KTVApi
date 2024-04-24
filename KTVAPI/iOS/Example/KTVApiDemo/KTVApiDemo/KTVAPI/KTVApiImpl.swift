@@ -83,7 +83,9 @@ fileprivate enum KTVSongMode: Int {
     
     private let tag = "KTV_API_LOG"
     private let messageId = "agora:scenarioAPI"
+
     private let version = "4.3.0"
+
     private let lyricSyncVersion = 2
 
     private var singerRole: KTVSingRole = .audience {
@@ -106,9 +108,9 @@ fileprivate enum KTVSongMode: Int {
     private lazy var apiDelegateHandler = KTVApiRTCDelegateHandler(with: self)
     
     private var totalSize: Int = 0
-    
+
     private var apiRepoter: APIReporter?
-    
+
     deinit {
         mcc?.register(nil)
         agoraPrint("deinit KTVApiImpl")
@@ -488,7 +490,9 @@ extension KTVApiImpl {
     }
     
     @objc public func enableMutipath(enable: Bool) {
+
         sendCustomMessage(with: "enableMutipath", dict: ["enable":enable])
+
         agoraPrint("enableMutipath:\(enable)")
         enableMultipathing = enable
         if singerRole == .coSinger || singerRole == .leadSinger {
@@ -501,12 +505,14 @@ extension KTVApiImpl {
     }
 
     private func agoraPrint(_ message: String) {
+
         apiRepoter?.writeLog(content: message, level: .info)
     }
     
     private func agoraPrintError(_ message: String) {
         apiRepoter?.writeLog(content: message, level: .error)
     }
+
 }
 
 
@@ -1346,6 +1352,7 @@ extension KTVApiImpl {
         sendStreamMessageWithDict(dict, success: nil)
     }
     
+
     private func sendCustomMessage(with event: String, dict: [String: Any]) {
         apiRepoter?.reportFuncEvent(name: event, value: dict, ext: [:])
     }

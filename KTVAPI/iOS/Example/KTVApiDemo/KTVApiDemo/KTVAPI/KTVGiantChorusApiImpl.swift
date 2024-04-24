@@ -122,10 +122,12 @@ fileprivate enum KTVSongMode: Int {
     
     private let tag = "KTV_API_LOG"
     private let messageId = "agora:scenarioAPI"
+
     private let version = "4.3.0"
     private let lyricSyncVersion = 2
     
     private var apiRepoter: APIReporter?
+
     
     deinit {
         mcc?.register(nil)
@@ -374,7 +376,9 @@ extension KTVGiantChorusApiImpl {
     }
     
     @objc public func enableMutipath(enable: Bool) {
+
         sendCustomMessage(with: "enableMutipath", dict: ["enable":enable])
+
         agoraPrint("enableMutipath:\(enable)")
         enableMultipathing = enable
         if singerRole == .coSinger || singerRole == .leadSinger {
@@ -1613,6 +1617,7 @@ extension KTVGiantChorusApiImpl {
         sendStreamMessageWithDict(dict, success: nil)
     }
     
+
 //    private func sendCustomMessage(with event: String, label: String) {
 //        apiConfig?.engine?.sendCustomReportMessage(messageId, category: version, event: event, label: label, value: 0)
 //        apiRepoter?.reportFuncEvent(name: event, value: <#T##[String : Any]#>, ext: <#T##[String : Any]#>)
@@ -1979,7 +1984,7 @@ extension KTVGiantChorusApiImpl {
                 agoraPrint("选路重新订阅, newSubScribeSingerMap:\(subScribeSingerMap)")
             }
         }
-
+  
         private func processSubscribeTask() {
             if !mStopProcessDelay && singerRole != .audience {
                 let n = singerRole == .leadSinger ? apiConfig?.routeSelectionConfig.streamNum : (apiConfig?.routeSelectionConfig.streamNum ?? 0) - 1

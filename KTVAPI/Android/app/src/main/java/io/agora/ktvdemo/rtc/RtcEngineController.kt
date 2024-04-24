@@ -25,7 +25,7 @@ object RtcEngineController {
             if (innerRtcEngine == null) {
                 val config = RtcEngineConfig()
                 config.mContext = MyApplication.app()
-                config.mAppId = BuildConfig.AGORA_APP_ID
+                config.mAppId = "aab8b8f5a8cd4469a63042fcfafe7063"
                 config.mEventHandler = object : IRtcEngineEventHandler() {
                     override fun onError(err: Int) {
                         super.onError(err)
