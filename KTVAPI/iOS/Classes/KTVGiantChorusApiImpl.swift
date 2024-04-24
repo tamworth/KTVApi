@@ -1981,3 +1981,20 @@ extension KTVGiantChorusApiImpl {
         processSubscribeFuture = nil
     }
 }
+
+
+extension Date {
+    /// 获取当前 秒级 时间戳 - 10位
+    ///
+    var timeStamp : TimeInterval {
+        let timeInterval: TimeInterval = self.timeIntervalSince1970
+        return timeInterval
+    }
+    /// 获取当前 毫秒级 时间戳 - 13位
+    var milListamp : TimeInterval {
+        let timeInterval: TimeInterval = self.timeIntervalSince1970
+        let millisecond = CLongLong(round(timeInterval*1000))
+        return TimeInterval(millisecond)
+    }
+}
+
