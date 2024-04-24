@@ -13,6 +13,7 @@
 		E39BAF772B6CC695002C692F /* LrcTime.proto in Sources */ = {isa = PBXBuildFile; fileRef = E39BAF752B6CC695002C692F /* LrcTime.proto */; };
 		E39BAF792B6CCC65002C692F /* 不如跳舞.xml in Resources */ = {isa = PBXBuildFile; fileRef = E39BAF782B6CCC65002C692F /* 不如跳舞.xml */; };
 		E39BAF7B2B6CCC74002C692F /* 不如跳舞.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = E39BAF7A2B6CCC74002C692F /* 不如跳舞.mp4 */; };
+		E3EC073C2BD8BB8600CB8279 /* APIReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3EC073B2BD8BB8600CB8279 /* APIReporter.swift */; };
 		E3ED270B2A822E9D0087B7AA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED270A2A822E9D0087B7AA /* AppDelegate.swift */; };
 		E3ED270D2A822E9D0087B7AA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED270C2A822E9D0087B7AA /* SceneDelegate.swift */; };
 		E3ED270F2A822E9D0087B7AA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3ED270E2A822E9D0087B7AA /* ViewController.swift */; };
@@ -46,6 +47,7 @@
 		E39BAF752B6CC695002C692F /* LrcTime.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.protobuf; path = LrcTime.proto; sourceTree = "<group>"; };
 		E39BAF782B6CCC65002C692F /* 不如跳舞.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "不如跳舞.xml"; sourceTree = "<group>"; };
 		E39BAF7A2B6CCC74002C692F /* 不如跳舞.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "不如跳舞.mp4"; sourceTree = "<group>"; };
+		E3EC073B2BD8BB8600CB8279 /* APIReporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APIReporter.swift; sourceTree = "<group>"; };
 		E3ED27072A822E9D0087B7AA /* KTVApiDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KTVApiDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E3ED270A2A822E9D0087B7AA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E3ED270C2A822E9D0087B7AA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -143,6 +145,7 @@
 		E3ED271E2A822ED30087B7AA /* KTVAPI */ = {
 			isa = PBXGroup;
 			children = (
+				E3EC073B2BD8BB8600CB8279 /* APIReporter.swift */,
 				E3ED271F2A822ED30087B7AA /* KTVApiImpl.swift */,
 				E3ED27202A822ED30087B7AA /* KTVApi.swift */,
 				E38BDE772B6F7A77007A2834 /* KTVGiantChorusApiImpl.swift */,
@@ -287,6 +290,7 @@
 				E3ED27392A8312120087B7AA /* AgoraStringExtention.swift in Sources */,
 				E3ED273B2A8312120087B7AA /* AgoraDownLoadManager.swift in Sources */,
 				E3ED27212A822ED30087B7AA /* KTVApiImpl.swift in Sources */,
+				E3EC073C2BD8BB8600CB8279 /* APIReporter.swift in Sources */,
 				E39BAF772B6CC695002C692F /* LrcTime.proto in Sources */,
 				E3ED27222A822ED30087B7AA /* KTVApi.swift in Sources */,
 				E3ED270F2A822E9D0087B7AA /* ViewController.swift in Sources */,
