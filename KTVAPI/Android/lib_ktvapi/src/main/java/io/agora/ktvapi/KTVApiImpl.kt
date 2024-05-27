@@ -190,11 +190,13 @@ class KTVApiImpl(
 
     // 日志输出
     private fun ktvApiLog(msg: String) {
+        if (isRelease) return
         apiReporter.writeLog("[$tag][${ktvApiConfig.type}] $msg", LOG_LEVEL_INFO)
     }
 
     // 日志输出
     private fun ktvApiLogError(msg: String) {
+        if (isRelease) return
         apiReporter.writeLog("[$tag][${ktvApiConfig.type}] $msg", LOG_LEVEL_ERROR)
     }
 
@@ -249,6 +251,15 @@ class KTVApiImpl(
         //mRtcEngine.setParameters("{\"rtc.path_scheduling_strategy\": 0}")
     }
 
+    private fun resetParameters() {
+        mRtcEngine.setAudioScenario(AUDIO_SCENARIO_GAME_STREAMING)
+        mRtcEngine.setParameters("{\"che.audio.custom_bitrate\": 80000}")     // 兼容之前的profile = 3设置
+        mRtcEngine.setParameters("{\"che.audio.max_mixed_participants\": 3}") // 正常3路下行流混流
+        mRtcEngine.setParameters("{\"che.audio.neteq.prebuffer\": false}")    // 关闭 接收端快速对齐模式
+        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp\": false}") // 观众关闭 多端同步
+        mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp_broadcast\": false}") //主播关闭多端同步
+    }
+
     override fun addEventHandler(ktvApiEventHandler: IKTVApiEventHandler) {
         apiReporter.reportFuncEvent("addEventHandler", mapOf("ktvApiEventHandler" to ktvApiEventHandler), mapOf())
         ktvApiEventHandlerList.add(ktvApiEventHandler)
@@ -265,6 +276,7 @@ class KTVApiImpl(
         isRelease = true
         singerRole = KTVSingRole.Audience
 
+        resetParameters()
         stopSyncPitch()
         stopDisplayLrc()
         this.mLastReceivedPlayPosTime = null
