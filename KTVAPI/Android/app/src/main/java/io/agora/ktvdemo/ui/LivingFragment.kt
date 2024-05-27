@@ -101,23 +101,86 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                 if (KeyCenter.role == KTVSingRole.LeadSinger) {
                     toast(getString(R.string.app_no_premission))
                 } else {
-                    ktvApi.switchSingerRole(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
-                        override fun onSwitchRoleSuccess() {
-                            mainHandler.post {
-                                toast("加入合唱成功，自动开麦")
-                                ktvApi.muteMic(false)
-                                btMicStatus.text = "麦克风开"
-                                tvSinger.text = getString(R.string.app_co_singer)
-                                KeyCenter.role = KTVSingRole.CoSinger
-                            }
-                        }
+                    if (KeyCenter.isMcc) {
+                        // 使用声网版权中心歌单
+                        val musicConfiguration = KTVLoadMusicConfiguration(
+                            KeyCenter.songCode.toString(), // 需要传入唯一的歌曲id，demo 简化逻辑传了songCode
+                            KeyCenter.LeadSingerUid,
+                            KTVLoadMusicMode.LOAD_MUSIC_ONLY
+                        )
+                        ktvApi.loadMusic(KeyCenter.songCode, musicConfiguration, object : IMusicLoadStateListener {
+                            override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
+                                Log.d("Music", "onMusicLoadSuccess, songCode: $songCode, lyricUrl: $lyricUrl")
+                                // 切换身份为合唱者
+                                ktvApi.switchSingerRole(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
+                                    override fun onSwitchRoleSuccess() {
+                                        mainHandler.post {
+                                            toast("加入合唱成功，自动开麦")
+                                            ktvApi.muteMic(false)
+                                            btMicStatus.text = "麦克风开"
+                                            tvSinger.text = getString(R.string.app_co_singer)
+                                            KeyCenter.role = KTVSingRole.CoSinger
+                                        }
+                                    }
 
-                        override fun onSwitchRoleFail(reason: SwitchRoleFailReason) {
-                            mainHandler.post {
-                                toast("加入合唱失败")
+                                    override fun onSwitchRoleFail(reason: SwitchRoleFailReason) {
+                                        mainHandler.post {
+                                            toast("加入合唱失败")
+                                        }
+                                    }
+                                })
                             }
-                        }
-                    })
+
+                            override fun onMusicLoadFail(songCode: Long, reason: KTVLoadMusicFailReason) {
+                                Log.d("Music", "onMusicLoadFail, songCode: $songCode, reason: $reason")
+                            }
+
+                            override fun onMusicLoadProgress(
+                                songCode: Long,
+                                percent: Int,
+                                status: MusicLoadStatus,
+                                msg: String?,
+                                lyricUrl: String?
+                            ) {
+                                Log.d("Music", "onMusicLoadProgress, songCode: $songCode, percent: $percent")
+                                mainHandler.post {
+                                    binding?.btLoadProgress?.text = "下载进度：$percent%"
+                                }
+                            }
+                        })
+                    } else {
+                        // 使用本地音乐文件
+                        val musicConfiguration = KTVLoadMusicConfiguration(
+                            KeyCenter.songCode.toString(), // 需要传入唯一的歌曲id，demo 简化逻辑传了songCode
+                            KeyCenter.LeadSingerUid,
+                            KTVLoadMusicMode.LOAD_NONE
+                        )
+                        val songPath = requireActivity().filesDir.absolutePath + File.separator
+                        val songName = "不如跳舞"
+                        ktvApi.loadMusic("$songPath$songName.mp4", musicConfiguration)
+                        val fileLrc = File("$songPath$songName.xml")
+                        val lyricsModel = KaraokeView.parseLyricsData(fileLrc)
+                        karaokeView?.lyricsData = lyricsModel
+
+                        // 切换身份为合唱者
+                        ktvApi.switchSingerRole(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
+                            override fun onSwitchRoleSuccess() {
+                                mainHandler.post {
+                                    toast("加入合唱成功，自动开麦")
+                                    ktvApi.muteMic(false)
+                                    btMicStatus.text = "麦克风开"
+                                    tvSinger.text = getString(R.string.app_co_singer)
+                                    KeyCenter.role = KTVSingRole.CoSinger
+                                }
+                            }
+
+                            override fun onSwitchRoleFail(reason: SwitchRoleFailReason) {
+                                mainHandler.post {
+                                    toast("加入合唱失败")
+                                }
+                            }
+                        })
+                    }
                 }
             }
 
@@ -153,7 +216,8 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                 if (KeyCenter.isMcc) {
                     // 使用声网版权中心歌单
                     val musicConfiguration = KTVLoadMusicConfiguration(
-                        KeyCenter.songCode.toString(), KeyCenter.LeadSingerUid,
+                        KeyCenter.songCode.toString(), // 需要传入唯一的歌曲id，demo 简化逻辑传了songCode
+                        KeyCenter.LeadSingerUid,
                         if (KeyCenter.role == KTVSingRole.Audience) KTVLoadMusicMode.LOAD_LRC_ONLY else KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
                     )
                     ktvApi.loadMusic(KeyCenter.songCode, musicConfiguration, object : IMusicLoadStateListener {
@@ -204,7 +268,9 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                 } else {
                     // 使用本地音乐文件
                     val musicConfiguration = KTVLoadMusicConfiguration(
-                        KeyCenter.songCode.toString(), KeyCenter.LeadSingerUid, KTVLoadMusicMode.LOAD_NONE
+                        KeyCenter.songCode.toString(), // 需要传入唯一的歌曲id，demo 简化逻辑传了songCode
+                        KeyCenter.LeadSingerUid,
+                        KTVLoadMusicMode.LOAD_NONE
                     )
                     val songPath = requireActivity().filesDir.absolutePath + File.separator
                     val songName = "不如跳舞"
@@ -381,7 +447,8 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
         if (KeyCenter.isMcc) {
             // 使用声网版权中心歌单
             val musicConfiguration = KTVLoadMusicConfiguration(
-                KeyCenter.songCode.toString(), KeyCenter.LeadSingerUid,
+                KeyCenter.songCode.toString(), // 需要传入唯一的歌曲id，demo 简化逻辑传了songCode
+                KeyCenter.LeadSingerUid,
                 if (KeyCenter.role == KTVSingRole.Audience) KTVLoadMusicMode.LOAD_LRC_ONLY else KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
             )
             ktvApi.loadMusic(KeyCenter.songCode, musicConfiguration, object : IMusicLoadStateListener {
@@ -422,7 +489,9 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
         } else {
             // 使用本地音乐文件
             val musicConfiguration = KTVLoadMusicConfiguration(
-                KeyCenter.songCode.toString(), KeyCenter.LeadSingerUid, KTVLoadMusicMode.LOAD_NONE
+                KeyCenter.songCode.toString(), // 需要传入唯一的歌曲id，demo 简化逻辑传了songCode
+                KeyCenter.LeadSingerUid,
+                KTVLoadMusicMode.LOAD_NONE
             )
             val songPath = requireActivity().filesDir.absolutePath + File.separator
             val songName = "不如跳舞"
