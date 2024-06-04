@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -15,7 +16,7 @@
         android:id="@+id/tvChooseRole"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/app_choose_role_tag"
+        android:text="请选择合唱身份!"
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -29,11 +30,24 @@
         android:layout_marginHorizontal="32dp"
         android:layout_marginTop="32dp"
         android:background="@color/darker_gray"
-        android:text="@string/app_lead_singer"
+        android:text="主唱"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvChooseRole" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnCoSinger"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/lighter_gray"
+        android:text="合唱"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnLeadSinger" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnAudience"
@@ -42,22 +56,22 @@
         android:layout_marginHorizontal="32dp"
         android:layout_marginTop="16dp"
         android:background="@color/lighter_gray"
-        android:text="@string/app_audience"
+        android:text="观众"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnLeadSinger" />
+        app:layout_constraintTop_toBottomOf="@id/btnCoSinger" />
 
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/etChannelId"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="24dp"
-        android:hint="@string/app_input_channel_name"
+        android:layout_marginTop="32dp"
+        android:hint="input channel id"
         android:inputType="text"
-        android:lines="1"
         android:maxLength="9"
+        android:lines="1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnAudience" />
@@ -77,39 +91,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="@string/app_mcc_tag" />
+            android:text="十年" />
 
         <RadioButton
             android:id="@+id/rbtLocalSong"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="@string/app_local_music_tag" />
-    </RadioGroup>
-
-    <RadioGroup
-        android:id="@+id/ktvApiType"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="10dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/groupSongType">
-
-        <RadioButton
-            android:id="@+id/rbtNormalChorus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="@string/app_normal_ktvapi_tag" />
-
-        <RadioButton
-            android:id="@+id/rbtGiantChorus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="@string/app_giant_ktvapi_tag" />
+            android:text="在你的身边" />
     </RadioGroup>
 
 
@@ -119,9 +108,9 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
         android:layout_marginTop="32dp"
-        android:text="@string/app_start_enjoy_tag"
+        android:text="开始合唱"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ktvApiType" />
+        app:layout_constraintTop_toBottomOf="@id/groupSongType" />
 </androidx.constraintlayout.widget.ConstraintLayout>

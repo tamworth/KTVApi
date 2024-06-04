@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity() {
         val PERMISSIONS = arrayOf(
             Manifest.permission.RECORD_AUDIO
         )
+
     }
 
     private lateinit var binding: ActivityMainBinding

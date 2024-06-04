@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">KTVAPI-Demo</string>
-    <string name="app_lead_singer">主唱</string>
-    <string name="app_co_singer">合唱</string>
-    <string name="app_audience">观众</string>
+    <string name="app_lead_singer">leadSinger</string>
+    <string name="app_co_singer">coSinger</string>
+    <string name="app_audience">audience</string>
     <string name="app_no_lyric">当前没有歌词</string>
     <string name="app_join_chorus">加入合唱</string>
     <string name="app_leave_chorus">离开合唱</string>
@@ -14,13 +14,4 @@
     <string name="app_remove_music">移除歌曲</string>
     <string name="app_mic_on">开麦</string>
     <string name="app_mic_off">关麦</string>
-    <string name="app_choose_role_tag">请选择初始演唱身份!</string>
-    <string name="app_input_channel_name">请输入 channel name</string>
-    <string name="app_mcc_tag">MCC 声网歌曲中心</string>
-    <string name="app_local_music_tag">Local 本地音乐</string>
-    <string name="app_normal_ktvapi_tag">独唱、小合唱</string>
-    <string name="app_giant_ktvapi_tag">大合唱</string>
-    <string name="app_start_enjoy_tag">开始体验</string>
-    <string name="app_appid_check">请检查 gradle.properties 文件内 APPID APP 证书是否正确填写</string>
-    <string name="app_restful_check">请检查 gradle.properties 文件内 RESTFUL API KEY 是否正确填写</string>
 </resources>

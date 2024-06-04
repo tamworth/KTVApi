@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <io.agora.karaoke_view.v11.LyricsView
+    <io.agora.karaoke_view_ex.LyricsView
         android:id="@+id/lyricsView"
         android:layout_width="match_parent"
         android:layout_height="200dp"
@@ -20,8 +20,6 @@
         app:layout_constraintVertical_bias="0.0"
         app:lineSpacing="6dp"
         app:paddingTop="2dp"
-        app:startOfVerseIndicatorPaddingTop="6dp"
-        app:startOfVerseIndicatorRadius="4dp"
         app:textGravity="center"
         app:textSize="14sp" />
 
@@ -65,9 +63,10 @@
         app:layout_constraintStart_toEndOf="@+id/btLoadMusic" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/btLoadProgress"
+        android:id="@+id/tvMusicProcess"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="下载进度："
         app:layout_constraintTop_toBottomOf="@+id/lyricsView"
         app:layout_constraintStart_toEndOf="@+id/btRemoveMusic" />
 
@@ -76,6 +75,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/app_join_chorus"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/btLoadMusic"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -84,6 +84,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/app_leave_chorus"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/btLoadMusic"
         app:layout_constraintStart_toEndOf="@+id/btJoinChorus" />
 
@@ -104,6 +105,22 @@
         app:layout_constraintStart_toEndOf="@+id/btOriginal" />
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btPause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="暂停"
+        app:layout_constraintTop_toBottomOf="@+id/btOriginal"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btPlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="播放"
+        app:layout_constraintTop_toBottomOf="@+id/btOriginal"
+        app:layout_constraintStart_toEndOf="@+id/btPause" />
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btDaoChang"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -116,6 +133,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/app_mic_on"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/btOriginal"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -124,14 +142,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/app_mic_off"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/btOriginal"
         app:layout_constraintStart_toEndOf="@+id/btMicOn" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/btMicStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/btOriginal"
-        app:layout_constraintStart_toEndOf="@+id/btMicOff" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

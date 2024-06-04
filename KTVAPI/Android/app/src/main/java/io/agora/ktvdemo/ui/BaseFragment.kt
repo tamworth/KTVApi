@@ -34,7 +34,7 @@ abstract class BaseFragment<T : ViewBinding?> : Fragment() {
         rootView = null
     }
 
-    protected fun toast(msg:String) {
+    protected fun toast(msg:String){
         Toast.makeText(requireContext(),msg, Toast.LENGTH_LONG).show()
     }
 }
