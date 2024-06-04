@@ -4,7 +4,9 @@ platform :ios, '13.0'
 
 target 'KTVApiDemo' do
   pod 'AgoraRtcEngine_Special_iOS', '4.1.1.27'
-  pod 'AgoraLyricsScore', '1.1.6'
+#  pod 'AgoraLyricsScore', '1.1.6'
+  pod "AgoraLyricsScoreEx", "2.0.0.131"
+  pod 'AgoraMccExService', :path => 'AgoraMccExService.podspec'
   pod 'Zip'
   pod 'SVProgressHUD'
   pod 'SwiftProtobuf'

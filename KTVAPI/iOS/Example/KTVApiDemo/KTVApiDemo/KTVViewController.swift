@@ -8,6 +8,7 @@
 import UIKit
 import Foundation
 import AgoraRtcKit
+import AgoraMccExService
 import SVProgressHUD
 public enum LoadMusicType: Int {
     case mcc //声网歌曲中心
@@ -24,15 +25,16 @@ class KTVViewController: UIViewController {
     var ktvApi: KTVApiDelegate!
     var rtcToken: String?
     var rtmToken: String?
+    var audienceToken: String?
     var rtcPlayerToken: String?
     var userId: Int = 0
-    var isCantata: Bool = false
+    var isCantata: Bool = true
     
     let mainSingerId = 1000
     let coSingerId = 2000
     let audienceId = 3000
     
-    let mccSongCode = 6625526603433040
+    let mccSongCode = 40289835
     
     var lyricView: KTVLyricView!
     
@@ -75,7 +77,7 @@ class KTVViewController: UIViewController {
         layoutUI()
         joinRTCChannel()
         
-        if isCantata && role == .leadSinger{
+        if role == .leadSinger{
             ApiManager.shared.fetchStartCloud(mainChannel: self.channelName, cloudRtcUid: 232425) {[weak self] flag in
                 if flag == false {//云端合流失败
                     SVProgressHUD.show(withStatus: "云端合流失败")
@@ -168,53 +170,156 @@ class KTVViewController: UIViewController {
         config.ordered = false
         config.syncWithAudio = false
         rtcKit.createDataStream(&rtcDataStreamId, config: config)
-        rtcKit.setClientRole(role == .audience ? .audience : .broadcaster)
+//        rtcKit.setClientRole(role == .audience ? .audience : .broadcaster)
 
     }
     
+    private func joinChannel(role: KTVSingRole) {
+        let api = self.ktvApi as! KTVApiImpl
+        if self.role == .audience {
+            self.rtcKit.leaveChannel()
+            
+            let mediaoption = AgoraRtcChannelMediaOptions()
+            mediaoption.autoSubscribeAudio = true
+            let connection = AgoraRtcConnection()
+            connection.channelId = "\(self.channelName)_ad"
+            connection.localUid = UInt(self.userId)
+            self.rtcKit.joinChannelEx(byToken: self.audienceToken, connection: connection, delegate: api, mediaOptions: mediaoption)
+        } else {
+            let connection = AgoraRtcConnection()
+            connection.channelId = "\(self.channelName)_ad"
+            connection.localUid = UInt(self.userId)
+            self.rtcKit.leaveChannelEx(connection)
+            
+            self.rtcKit.delegate = api
+            self.rtcKit.joinChannel(byToken: self.rtcToken, channelId: self.channelName, uid: UInt(self.userId), mediaOptions: self.mediaOptions())
+        }
+        self.loadMusic()
+    }
+    
     private func loadKTVApi() {
-        if isCantata {
+//        if isCantata {
             getCantataMccData(with: "\(userId)") {[weak self] rtcToken, rtmToken, audienceToken, rtcPlayerToken in
                 guard let self = self else {return}
                 self.rtcToken = rtcToken
                 self.rtmToken = rtmToken
-                self.rtcPlayerToken = rtcPlayerToken
-
-                let giantConfig = GiantChorusConfiguration(appId: KeyCenter.AppId, rtmToken: rtmToken ?? "", engine: rtcKit, localUid: self.userId, audienceChannelName: "\(channelName)_ad", audienceChannelToken: audienceToken ?? "", chorusChannelName: "\(channelName)", chorusChannelToken: rtcToken ?? "", musicStreamUid: 2023, musicChannelToken: rtcPlayerToken ?? "", maxCacheSize: 10, musicType: self.type == .mcc ? .mcc : .local, routeSelectionConfig: GiantChorusRouteSelectionConfig(type: .byDelay, streamNum: 6), mccDomain: nil)
-                
-                self.ktvApi = KTVGiantChorusApiImpl()
-                self.ktvApi.createKTVGiantChorusApi?(config: giantConfig)
-                self.ktvApi.renewInnerDataStreamId()
-                self.ktvApi.setLrcView(view: self.lyricView)
-
-                self.ktvApi.addEventHandler(ktvApiEventHandler: self)
-                
-                self.rtcKit.setParameters("{\"rtc.use_audio4\": true}")
-                
-                let connection = AgoraRtcConnection(channelId: "\(channelName)_ad", localUid: self.userId)
-                let _ = self.rtcKit.joinChannelEx(byToken: audienceToken, connection: connection, delegate: self, mediaOptions: self.mediaOptions())
-                
-                self.loadMusic()
-            }
-        } else {
-            getMccData(with: "\(userId)") {[weak self] rtcToken, rtmToken, rtcPlayerToken in
-                guard let self = self else {return}
-                self.rtcToken = rtcToken
-                self.rtmToken = rtmToken
+                self.audienceToken = audienceToken
                 self.rtcPlayerToken = rtcPlayerToken
                 
-                let apiConfig = KTVApiConfig(appId: KeyCenter.AppId, rtmToken: self.type == .mcc ? (self.rtmToken ?? "") : "", engine: self.rtcKit, channelName: self.channelName, localUid: self.userId, chorusChannelName: "\(self.channelName)_ex", chorusChannelToken: self.rtcPlayerToken ?? "", type: .normal, musicType: self.type == .mcc ? .mcc : .local, maxCacheSize: 10, mccDomain: nil)
-
-                self.ktvApi = KTVApiImpl()
-                self.ktvApi.createKtvApi?(config: apiConfig)
+                let deviceId = "2323"
+                let appid = "203321"
+                let appKey = "4059144a3ace4a23a351ca3f96e6693d"
+                let token = "KNH5KIN1I2AML9IMFDV20HKGP47MOCOTMD3DCHB6SURU1IRSA6MB868UHFG5JU85OBKGRUKE35Q6QT9TVVIGE492K9JCOUU9GUN78LLLPPLM2895VGT0290J8V5F4ELKQKB35EE9FB3E1QPH9FRIMMBHHP1DNOID30JF2J37H80KA037SJAA0K5FB1509U1Q"
+                let userId = "3221E21771B747E76481D6200E419FCD"
+                
+                let vendorConfig = AgoraYSDVendorConfigure(appId: appid,
+                                                           appKey: appKey,
+                                                           token: token,
+                                                           userId: userId,
+                                                           deviceId: deviceId,
+                                                           urlTokenExpireTime: 60 * 15,
+                                                           chargeMode: .once)
+                let config = AgoraMusicContentCenterExConfiguration(rtcEngine: rtcKit,
+                                                                    vendorConfigure: vendorConfig,
+                                                                    enableLog: true,
+                                                                    enableSaveLogToFile: true,
+                                                                    logFilePath: "",
+                                                                    maxCacheSize: 50,
+                                                                    eventDelegate: nil,
+                                                                    scoreEventDelegate: nil,
+                                                                    audioFrameDelegate: nil)
+                let mcc = AgoraMusicContentCenterEx.sharedInstance()
+                mcc.initialize(config)
+                
+                
+                let apiConfig =
+                KTVApiConfig(appId: KeyCenter.AppId,
+                             mcc: mcc,
+                             engine: self.rtcKit,
+                             channelName: self.channelName,
+                             localUid: self.userId,
+                             chorusUid: 2023,
+                             chorusChannelName: "\(self.channelName)_ad",
+                             chorusChannelToken: "",
+                             mpkChannelToken: self.rtcPlayerToken ?? "",
+                             maxCacheSize: 10,
+                             ktvType: .Cantata,
+                             isRoomOwner: true)
+                
+                self.ktvApi = KTVApiImpl(config: apiConfig)
                 self.ktvApi.renewInnerDataStreamId()
                 self.ktvApi.setLrcView(view: self.lyricView)
                 self.ktvApi.addEventHandler(ktvApiEventHandler: self)
-                
-                self.rtcKit.joinChannel(byToken: KeyCenter.Token, channelId: self.channelName, uid: UInt(self.userId), mediaOptions: self.mediaOptions())
-                self.loadMusic()
+//                if self.role == .leadSinger {
+//                    self.rtcKit.delegate = api
+//                    self.rtcKit.joinChannel(byToken: KeyCenter.Token, channelId: self.channelName, uid: UInt(self.userId), mediaOptions: self.mediaOptions())
+//                    self.loadMusic()
+//                } else {
+//                    let mediaoption = AgoraRtcChannelMediaOptions()
+//                    mediaoption.autoSubscribeAudio = true
+//                    let connection = AgoraRtcConnection()
+//                    connection.channelId = "\(self.channelName)_ad"
+//                    connection.localUid = UInt(self.userId)
+//                    self.rtcKit.joinChannelEx(byToken: KeyCenter.Token, connection: connection, delegate: api, mediaOptions: mediaoption)
+//                }
+                joinChannel(role: self.role)
             }
-        }
+//        } else {
+//            //userid 要用这个生成 https://yapi-test.tuwan.com/yinsuda/getUserData?uid=
+//            getMccData(with: "\(userId)") {[weak self] rtcToken, rtmToken, rtcPlayerToken in
+//                guard let self = self else {return}
+//                self.rtcToken = rtcToken
+//                self.rtmToken = rtmToken
+//                self.rtcPlayerToken = rtcPlayerToken
+//                
+//                let deviceId = "2323"
+//                let appid = "203321"
+//                let appKey = "4059144a3ace4a23a351ca3f96e6693d"
+//                let token = "KNH5KIN1I2AML9IMFDV20HKGP47MOCOTMD3DCHB6SURU1IRSA6MB868UHFG5JU85OBKGRUKE35Q6QT9TVVIGE492K9JCOUU9GUN78LLLPPLM2895VGT0290J8V5F4ELKQKB35EE9FB3E1QPH9FRIMMBHHP1DNOID30JF2J37H80KA037SJAA0K5FB1509U1Q"
+//                let userId = "3221E21771B747E76481D6200E419FCD"
+//                
+//                let vendorConfig = AgoraYSDVendorConfigure(appId: appid,
+//                                                           appKey: appKey,
+//                                                           token: token,
+//                                                           userId: userId,
+//                                                           deviceId: deviceId,
+//                                                           urlTokenExpireTime: 60 * 15,
+//                                                           chargeMode: .once)
+//                let config = AgoraMusicContentCenterExConfiguration(rtcEngine: rtcKit,
+//                                                                    vendorConfigure: vendorConfig,
+//                                                                    enableLog: true,
+//                                                                    enableSaveLogToFile: true,
+//                                                                    logFilePath: "",
+//                                                                    maxCacheSize: 50,
+//                                                                    eventDelegate: nil,
+//                                                                    scoreEventDelegate: nil,
+//                                                                    audioFrameDelegate: nil)
+//                let mcc = AgoraMusicContentCenterEx.sharedInstance()
+//                mcc.initialize(config)
+//                
+//                let apiConfig =
+//                KTVApiConfig(appId: KeyCenter.AppId,
+//                             mcc: mcc,
+//                             engine: self.rtcKit,
+//                             channelName: self.channelName,
+//                             localUid: self.userId,
+//                             chorusUid: self.userId,
+//                             chorusChannelName: "\(self.channelName)_ex",
+//                             chorusChannelToken: self.rtcPlayerToken ?? "",
+//                             mpkChannelToken: self.rtcPlayerToken ?? "",
+//                             maxCacheSize: 10,
+//                             ktvType: .Cantata,
+//                             isRoomOwner: true)
+//                
+//                self.ktvApi = KTVApiImpl(config: apiConfig)
+//                self.ktvApi.renewInnerDataStreamId()
+//                self.ktvApi.setLrcView(view: self.lyricView)
+//                self.ktvApi.addEventHandler(ktvApiEventHandler: self)
+//                
+//                self.rtcKit.joinChannel(byToken: KeyCenter.Token, channelId: self.channelName, uid: UInt(self.userId), mediaOptions: self.mediaOptions())
+//                self.loadMusic()
+//            }
+//        }
     }
     
     private func mediaOptions() -> AgoraRtcChannelMediaOptions {
@@ -225,7 +330,7 @@ class KTVViewController: UIViewController {
         options.channelProfile = .liveBroadcasting
         options.autoSubscribeAudio = true
         if type == .mcc {
-            options.publishMediaPlayerId = Int(ktvApi.getMusicPlayer()?.getMediaPlayerId() ?? 0)
+//            options.publishMediaPlayerId = Int(ktvApi.getMusicPlayer()?.getMediaPlayerId() ?? 0)
         }
         options.enableAudioRecordingOrPlayout = true
         return options
@@ -255,7 +360,7 @@ class KTVViewController: UIViewController {
             songConfig.mainSingerUid = mainSingerId
             songConfig.songIdentifier = "chengdu"
             ktvApi.loadMusic(config: songConfig, url: mUrl)
-            self.lyricView.resetLrcData(with: lUrl)
+//            self.lyricView.resetLrcData(with: lUrl)
             switchRole()
         } else {
             let songConfig = KTVSongConfiguration()
@@ -272,7 +377,10 @@ class KTVViewController: UIViewController {
             
             self.loadMusicCallBack = {[weak self] flag, songCode in
                 guard let self = self else {return}
-                switchRole()
+                self.ktvApi.startScore(songCode: self.mccSongCode) {[weak self] state, _ in
+                    guard let self = self, state == .startScoreCompleted else {return}
+                    self.switchRole()
+                }
             }
         }
     }
@@ -378,13 +486,14 @@ extension KTVViewController {
             //本地歌曲不能取消歌曲下载
             SVProgressHUD.showInfo(withStatus: "当前场景不支持该操作")
         } else {
-            self.ktvApi.removeMusic(songCode: mccSongCode)
+//            self.ktvApi.removeMusic(songCode: mccSongCode)
         }
     }
     
     @objc private func joinChorus() {
         if role == .audience {
             role = .coSinger
+            joinChannel(role: role)
             loadMusic()
             switchRole()
         } else if role == .leadSinger || role == .soloSinger || role == .coSinger {
@@ -394,11 +503,11 @@ extension KTVViewController {
     }
 
     @objc private func mute() {
-        self.ktvApi.muteMic(muteStatus: true)
+//        self.ktvApi.muteMic(muteStatus: true)
     }
     
     @objc private func unmute() {
-        self.ktvApi.muteMic(muteStatus: false)
+//        self.ktvApi.muteMic(muteStatus: false)
     }
 
 }
@@ -410,9 +519,10 @@ extension KTVViewController: AgoraRtcEngineDelegate {
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, audioMetadataReceived uid: UInt, metadata: Data) {
         if isCantata {
-            self.ktvApi.didAudioMetadataReceived(uid: uid, metadata: metadata)
+//            self.ktvApi.didAudioMetadataReceived(uid: uid, metadata: metadata)
         }
     }
+    
     
     @objc private func leaveChorus() {
         if role == .coSinger {
@@ -429,9 +539,9 @@ extension KTVViewController: AgoraRtcEngineDelegate {
         if role == .soloSinger || role == .leadSinger || role == .coSinger {
             //主唱合唱才能原唱
             if role == .soloSinger || role == .leadSinger {
-                self.ktvApi.getMusicPlayer()?.selectMultiAudioTrack(0, publishTrackIndex: 0)
+                self.ktvApi.getMediaPlayer()?.selectMultiAudioTrack(0, publishTrackIndex: 0)
             } else {
-                self.ktvApi.getMusicPlayer()?.selectAudioTrack(0)
+                self.ktvApi.getMediaPlayer()?.selectAudioTrack(0)
             }
         } else {
             SVProgressHUD.showInfo(withStatus: "当前身份不支持该操作")
@@ -442,9 +552,9 @@ extension KTVViewController: AgoraRtcEngineDelegate {
         if role == .leadSinger || role == .leadSinger || role == .coSinger {
             //主唱合唱才能原唱
             if role == .soloSinger || role == .leadSinger {
-                self.ktvApi.getMusicPlayer()?.selectMultiAudioTrack(1, publishTrackIndex: 1)
+                self.ktvApi.getMediaPlayer()?.selectMultiAudioTrack(1, publishTrackIndex: 1)
             } else {
-                self.ktvApi.getMusicPlayer()?.selectAudioTrack(1)
+                self.ktvApi.getMediaPlayer()?.selectAudioTrack(1)
             }
         } else {
             SVProgressHUD.showInfo(withStatus: "当前身份不支持该操作")
@@ -454,7 +564,7 @@ extension KTVViewController: AgoraRtcEngineDelegate {
 }
 
 extension KTVViewController: IMusicLoadStateListener {
-    func onMusicLoadProgress(songCode: Int, percent: Int, status: AgoraMusicContentCenterPreloadStatus, msg: String?, lyricUrl: String?) {
+    func onMusicLoadProgress(songCode: Int, percent: Int, status: AgoraMusicContentCenterExState, msg: String?, lyricUrl: String?) {
         //歌曲加载进度
         print("歌曲加载进度:\(percent)%")
     }
@@ -480,7 +590,7 @@ extension KTVViewController: KTVApiEventHandlerDelegate {
         
     }
     
-    func onSingingScoreResult(score: Float) {
+    func onLineScore(songCode: Int, value: AgoraLineScoreData) {
         
     }
     
