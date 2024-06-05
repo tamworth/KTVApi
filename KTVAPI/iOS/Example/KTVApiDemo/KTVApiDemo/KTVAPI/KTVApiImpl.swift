@@ -1846,6 +1846,11 @@ extension KTVApiImpl: AgoraMusicContentCenterExEventDelegate {
             let _songCode = "\(songCode)"
             guard let block = self.scoreCallbacks[_songCode] else { return }
             self.scoreCallbacks.removeValue(forKey: _songCode)
+            if (reason == .ysdErrorTokenError) {
+                self.getEventHander { delegate in
+                    delegate.onTokenPrivilegeWillExpire()
+                }
+            }
             block(state, songCode)
         }
     }
@@ -1861,11 +1866,11 @@ extension KTVApiImpl: AgoraMusicContentCenterExEventDelegate {
             let SongCode = "\(songCode)"
             guard let block = self.musicCallbacks[SongCode] else { return }
             self.musicCallbacks.removeValue(forKey: SongCode)
-            //        if (errorCode == .errorGateway) {
-            //            getEventHander { delegate in
-            //                delegate.onTokenPrivilegeWillExpire()
-            //            }
-            //        }
+            if (reason == .ysdErrorTokenError) {
+                self.getEventHander { delegate in
+                    delegate.onTokenPrivilegeWillExpire()
+                }
+            }
             block(state, songCode)
         }
     }
@@ -1877,11 +1882,11 @@ extension KTVApiImpl: AgoraMusicContentCenterExEventDelegate {
             let callback = self.lyricCallbacks[requestId]
             guard let lyricCallback = callback else { return }
             self.lyricCallbacks.removeValue(forKey: requestId)
-            //        if (reason == .errorGateway) {
-            //            getEventHander { delegate in
-            //                delegate.onTokenPrivilegeWillExpire()
-            //            }
-            //        }
+            if (reason == .ysdErrorTokenError) {
+                self.getEventHander { delegate in
+                    delegate.onTokenPrivilegeWillExpire()
+                }
+            }
             if lrcUrl.isEmpty {
                 lyricCallback(nil)
                 TWLog("onLyricResult: lrcUrl.isEmpty")
@@ -1899,11 +1904,11 @@ extension KTVApiImpl: AgoraMusicContentCenterExEventDelegate {
             let callback = self.pitchCallbacks[requestId]
             guard let pitchCallback = callback else { return }
             self.pitchCallbacks.removeValue(forKey: requestId)
-            //        if (reason == .errorGateway) {
-            //            getEventHander { delegate in
-            //                delegate.onTokenPrivilegeWillExpire()
-            //            }
-            //        }
+            if (reason == .ysdErrorTokenError) {
+                self.getEventHander { delegate in
+                    delegate.onTokenPrivilegeWillExpire()
+                }
+            }
             if pitchPath.isEmpty {
                 pitchCallback(nil)
                 TWLog("onPitchResult: pitchPath.isEmpty")
