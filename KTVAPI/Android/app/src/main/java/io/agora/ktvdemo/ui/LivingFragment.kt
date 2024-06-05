@@ -20,6 +20,8 @@ import io.agora.mccex.IMusicContentCenterEx
 import io.agora.mccex.MusicContentCenterExConfiguration
 import io.agora.mccex.constants.ChargeMode
 import io.agora.mccex.constants.MccExState
+import io.agora.mccex.model.LineScoreData
+import io.agora.mccex.model.RawScoreData
 import io.agora.mccex.model.YsdVendorConfigure
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.IRtcEngineEventHandler
@@ -76,7 +78,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
 
     private fun initView() {
         binding?.apply {
-            karaokeView = KaraokeView(lyricsView,null)
+            karaokeView = KaraokeView(lyricsView, scoringView)
 
             // 退出场景
             btnClose.setOnClickListener {
@@ -151,7 +153,7 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                     // 使用声网版权中心歌单
                     val musicConfiguration = KTVLoadMusicConfiguration(
                         KeyCenter.songCode.toString(), false, KeyCenter.LeadSingerUid,
-                        if (KeyCenter.isAudience()) KTVLoadMusicMode.LOAD_LRC_ONLY else KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
+                        if (KeyCenter.isAudience()) KTVLoadMusicMode.LOAD_LRC_ONLY else KTVLoadMusicMode.LOAD_MUSIC_AND_LRC, true
                     )
                     ktvApi.loadMusic(KeyCenter.songCode, musicConfiguration, object : IMusicLoadStateListener {
                         override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
@@ -216,11 +218,10 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                         }
                     })
                 } else {
-
                     // 使用声网版权中心歌单
                     val musicConfiguration = KTVLoadMusicConfiguration(
                         KeyCenter.songCode2.toString(), false, KeyCenter.LeadSingerUid,
-                        if (KeyCenter.isAudience()) KTVLoadMusicMode.LOAD_LRC_ONLY else KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
+                        if (KeyCenter.isAudience()) KTVLoadMusicMode.LOAD_LRC_ONLY else KTVLoadMusicMode.LOAD_MUSIC_AND_LRC, true
                     )
                     ktvApi.loadMusic(KeyCenter.songCode2, musicConfiguration, object : IMusicLoadStateListener {
                         override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
@@ -366,10 +367,10 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
         val contentCenterConfiguration = MusicContentCenterExConfiguration()
         contentCenterConfiguration.context = context
         contentCenterConfiguration.vendorConfigure = YsdVendorConfigure(
-            appId = "203321",
-            appKey = "4059144a3ace4a23a351ca3f96e6693d",
-            token = "KNH5KJVBH2UML9GKDLV20HKGP47MP2MFQT02O5MV88IB38KU1VKQFF5CIH077NTSILP415C6F2EK7BC615ILQII9L4BSLQPL4G2DRRK0M5QT47LUJ4ETOS3U9OFMHOVKK6OQASPHT68J3PH95HSL4J6JUUF5BN4SKUJOG1LTNLGHSMR49E61NTTF39C09U1Q",
-            userId = "ED5BBD86F7A853AF66A13DC5AA6A8863",
+            appId = BuildConfig.YSD_APP_ID,
+            appKey = BuildConfig.YSD_APP_Key,
+            token = BuildConfig.YSD_APP_TOKEN,
+            userId = BuildConfig.YSD_USERID,
             deviceId = "2323",
             chargeMode = ChargeMode.ONCE,
             urlTokenExpireTime = 60 * 15
@@ -404,11 +405,21 @@ class LivingFragment : BaseFragment<FragmentLivingBinding>() {
                 karaokeView?.setProgress(progress)
             }
 
-            override fun onDownloadLrcData(url: String?) {
-                url?.let {
-                    val mLyricsModel = KaraokeView.parseLyricData(File(it), null)
-                    if (mLyricsModel != null) {
-                        karaokeView?.setLyricData(mLyricsModel);
+            override fun onPitch(songCode: Long, data: RawScoreData) {
+                karaokeView?.setPitch(data.speakerPitch, data.progressInMs)
+            }
+
+            override fun onLineScore(songCode: Long, value: LineScoreData) {
+
+            }
+
+            override fun onDownloadLrcData(lyricPath: String?, pitchPath: String?) {
+                lyricPath?.let { lrc ->
+                    pitchPath?.let { pitch ->
+                        val mLyricsModel = KaraokeView.parseLyricData(File(lrc), File(pitch))
+                        if (mLyricsModel != null) {
+                            karaokeView?.setLyricData(mLyricsModel);
+                        }
                     }
                 }
             }

@@ -1,12 +1,14 @@
 package io.agora.ktvapi
 
-// TODO add
+// TODO diandian
 //import com.tuwan.twmusic.KTVSingRole
 //import com.tuwan.twmusic.TwILrcView
+import com.google.protobuf.Internal.BooleanList
 import io.agora.mccex.IMusicContentCenterEx
 import io.agora.mccex.constants.MccExState
 import io.agora.mccex.constants.MccExStateReason
 import io.agora.mccex.model.LineScoreData
+import io.agora.mccex.model.RawScoreData
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.IRtcEngineEventHandler
@@ -37,7 +39,7 @@ enum class KTVType(val value: Int) {
     Cantata(2)
 }
 
-// TODO remove
+// TODO diandian
 /**
  * 在KTVApi中的身份
  * @param SoloSinger 独唱者: 当前只有自己在唱歌
@@ -107,6 +109,7 @@ interface OnJoinChorusStateListener {
     fun onJoinChorusFail(reason: KTVJoinChorusFailReason)
 }
 
+// TODO diandian
 interface ILrcView {
     /**
      * ktvApi内部更新音乐播放进度progress时会主动调用此方法将进度值progress传给你的歌词组件，50ms回调一次
@@ -114,10 +117,16 @@ interface ILrcView {
      */
     fun onUpdateProgress(progress: Long, position: Long)
 
+
+    fun onPitch(songCode: Long, data: RawScoreData)
+
+
+    fun onLineScore(songCode: Long, value: LineScoreData)
+
     /**
      * ktvApi获取到歌词地址时会主动调用此方法将歌词地址url传给你的歌词组件，您需要在这个回调内完成歌词的下载
      */
-    fun onDownloadLrcData(url: String?)
+    fun onDownloadLrcData(lyricPath: String?, pitchPath: String?)
 }
 
 /**
@@ -219,12 +228,6 @@ abstract class IKTVApiEventHandler {
         totalVolume: Int
     ) {
     }
-
-    open fun onLineScore(
-        songCode: Long, value: LineScoreData
-    ) {
-
-    }
 }
 
 /**
@@ -270,7 +273,8 @@ data class KTVLoadMusicConfiguration(
     val songIdentifier: String,
     val autoPlay: Boolean = false,
     val mainSingerUid: Int,
-    val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
+    val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC,
+    val needPitch: Boolean = false
 )
 
 interface KTVApi {
@@ -448,7 +452,7 @@ interface KTVApi {
      * 设置歌词组件，在任意时机设置都可以生效
      * @param view 传入的歌词组件view， 需要继承ILrcView并实现ILrcView的三个接口
      */
-    fun setLrcView(view: ILrcView?) // TODO modify
+    fun setLrcView(view: ILrcView?) // TODO diandian
 
     /**
      * 设置歌词进度
@@ -480,15 +484,4 @@ interface KTVApi {
      * 获取mpk实例
      */
     fun getMediaPlayer(): IMediaPlayer
-
-//    /**
-//     * 获取缓存中所有的歌曲
-//     */
-//    fun getAllCache(): List<MusicCacheInfo>?
-//
-//    /**
-//     * 移除缓存中某个歌曲
-//     */
-//    fun removeCache(songCode: Long)
-
 }

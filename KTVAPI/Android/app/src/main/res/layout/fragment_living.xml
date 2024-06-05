@@ -5,18 +5,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <io.agora.karaoke_view_ex.ScoringView
+        android:id="@+id/scoringView"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:layout_marginTop="100dp"
+        android:background="#AA666666"
+        app:initialScore="0"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:pitchIndicatorRadius="6dp"
+        app:pitchStickHeight="4dp"
+        app:pitchStickHighlightedColor="#FF8AB4" />
+
     <io.agora.karaoke_view_ex.LyricsView
         android:id="@+id/lyricsView"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:background="#666666"
         android:paddingTop="14dp"
-        android:layout_marginTop="100dp"
         app:currentLineHighlightedTextColor="#FF8AB4"
         app:currentLineTextColor="@color/white"
         app:currentLineTextSize="16sp"
         app:labelWhenNoLyrics="@string/app_no_lyric"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scoringView"
         app:layout_constraintVertical_bias="0.0"
         app:lineSpacing="6dp"
         app:paddingTop="2dp"

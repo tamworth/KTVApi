@@ -25,6 +25,11 @@ android {
         buildConfigField "String", "AGORA_APP_CERTIFICATE", "\"${properties.getProperty("AGORA_APP_CERTIFICATE", "")}\""
         buildConfigField "String", "RESTFUL_API_KEY", "\"${properties.getProperty("RESTFUL_API_KEY", "")}\""
         buildConfigField "String", "RESTFUL_API_SECRET", "\"${properties.getProperty("RESTFUL_API_SECRET", "")}\""
+
+        buildConfigField "String", "YSD_APP_ID", "\"${properties.getProperty("YSD_APP_ID", "")}\""
+        buildConfigField "String", "YSD_APP_Key", "\"${properties.getProperty("YSD_APP_Key", "")}\""
+        buildConfigField "String", "YSD_APP_TOKEN", "\"${properties.getProperty("YSD_APP_TOKEN", "")}\""
+        buildConfigField "String", "YSD_USERID", "\"${properties.getProperty("YSD_USERID", "")}\""
     }
 
     buildTypes {
