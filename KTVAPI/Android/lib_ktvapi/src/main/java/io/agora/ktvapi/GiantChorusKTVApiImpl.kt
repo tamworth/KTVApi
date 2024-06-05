@@ -12,7 +12,6 @@ import io.agora.mccex.constants.MccExState
 import io.agora.mccex.constants.MccExStateReason
 import io.agora.mccex.model.LineScoreData
 import io.agora.mccex.model.RawScoreData
-import io.agora.mccex.model.YsdVendorConfigure
 // TODO
 //import com.tuwan.android.uitl.mmkv.MmkvDataUtils
 //import com.tuwan.twmusic.KTVSingRole
@@ -75,6 +74,8 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
 
     private val lyricCallbackMap =
         mutableMapOf<String, (songNo: Long, lyricUrl: String?) -> Unit>() // (requestId, callback)
+    private val pitchCallbackMap =
+        mutableMapOf<String, (songNo: Long, pitchUrl: String?) -> Unit>() // (requestId, callback)
     private val lyricSongCodeMap = mutableMapOf<String, Long>() // (requestId, songCode)
     private val startScoreMap = mutableMapOf<String, (songCode: Long, status: MccExState, msg: MccExStateReason) -> Unit>() // (songNo, callback)
     private val loadMusicCallbackMap =
@@ -256,6 +257,8 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
         loadMusicCallbackMap.clear()
         musicChartsCallbackMap.clear()
         musicCollectionCallbackMap.clear()
+        lyricCallbackMap.clear()
+        startScoreMap.clear()
         lrcView = null
 
         mRtcEngine.removeHandler(this)
@@ -452,12 +455,12 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
 
         if (config.mode == KTVLoadMusicMode.LOAD_LRC_ONLY) {
             // 只加载歌词
-            loadLyric(code) { song, lyricUrl ->
+            loadLyricAndPitch(config.needPitch, code) { song, lyricUrl, pitchUrl ->
                 if (this.songCode != song) {
                     // 当前歌曲已发生变化，以最新load歌曲为准
                     Log.e(TAG, "loadMusic failed: CANCELED")
                     musicLoadStateListener.onMusicLoadFail(song, KTVLoadSongFailReason.CANCELED)
-                    return@loadLyric
+                    return@loadLyricAndPitch
                 }
 
                 if (lyricUrl == null) {
@@ -467,7 +470,7 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
                 } else {
                     // 加载歌词成功
                     Log.d(TAG, "loadMusic success")
-                    lrcView?.onDownloadLrcData(lyricUrl)
+                    lrcView?.onDownloadLrcData(lyricUrl, pitchUrl)
                     musicLoadStateListener.onMusicLoadSuccess(song, lyricUrl)
                 }
             }
@@ -486,7 +489,7 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
                 }
                 if (config.mode == KTVLoadMusicMode.LOAD_MUSIC_AND_LRC) {
                     // 需要加载歌词
-                    loadLyric(song) { _, lyricUrl ->
+                    loadLyricAndPitch(config.needPitch, song) { _, lyricUrl, pitchUrl ->
                         if (this.songCode != song) {
                             // 当前歌曲已发生变化，以最新load歌曲为准
                             Log.e(TAG, "loadMusic failed: CANCELED")
@@ -494,7 +497,7 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
                                 song,
                                 KTVLoadSongFailReason.CANCELED
                             )
-                            return@loadLyric
+                            return@loadLyricAndPitch
                         }
 
                         if (lyricUrl == null) {
@@ -507,7 +510,7 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
                         } else {
                             // 加载歌词成功
                             Log.d(TAG, "loadMusic success")
-                            lrcView?.onDownloadLrcData(lyricUrl)
+                            lrcView?.onDownloadLrcData(lyricUrl, pitchUrl)
                             musicLoadStateListener.onMusicLoadProgress(
                                 song,
                                 100,
@@ -1125,7 +1128,6 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
 //                        Log.i(TAG, "play_status_seek4: " + mReceivedPlayPosition)//59069
                         if (mediaPlayerState == MediaPlayerState.PLAYER_STATE_PLAYING) {
                             // The delay here will impact both singer and audience side
-                            Log.d("xiru", "onUpdateProgress: $progress")
                             lrcView?.onUpdateProgress(progress, mReceivedPlayPosition)
                         } else {
                             lrcView?.onUpdateProgress(progress, 0)
@@ -1316,6 +1318,24 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
         }
     }
 
+    private fun loadLyricAndPitch(
+        needPitch: Boolean,
+        songNo: Long,
+        onLoadCallback: (songNo: Long, lyricUrl: String?, pitchUrl: String?) -> Unit
+    ) {
+        if (needPitch) {
+            loadLyric(songNo) { song, lyric ->
+                loadPitch(songNo) { _, pitch ->
+                    onLoadCallback.invoke(song, lyric, pitch)
+                }
+            }
+        } else {
+            loadLyric(songNo) { song, lyric ->
+                onLoadCallback.invoke(song, lyric, null)
+            }
+        }
+    }
+
     private fun loadLyric(
         songNo: Long,
         onLoadLyricCallback: (songNo: Long, lyricUrl: String?) -> Unit
@@ -1328,6 +1348,19 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
         }
         lyricSongCodeMap[requestId] = songNo
         lyricCallbackMap[requestId] = onLoadLyricCallback
+    }
+
+    private fun loadPitch(
+        songNo: Long,
+        onLoadPitchCallback: (songNo: Long, pitchUrl: String?) -> Unit
+    ) {
+        Log.d(TAG, "loadPitch: $songNo")
+        val requestId = mMusicCenter.getPitch(songNo)
+        if (requestId.isEmpty()) {
+            onLoadPitchCallback.invoke(songNo, null)
+            return
+        }
+        pitchCallbackMap[requestId] = onLoadPitchCallback
     }
 
     private fun preLoadMusic(
@@ -1618,7 +1651,6 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
 
     // 同步播放进度
     override fun onPositionChanged(position_ms: Long, timestamp_ms: Long) {
-        Log.d("xiru", "onPositionChanged: $position_ms")
         localPlayerPosition = position_ms
         localPlayerSystemTime = timestamp_ms
 
@@ -1853,7 +1885,7 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
         Log.d("xiru", "onLyricResult, requestId:$requestId, songCode:$songCode, lyricPath:$lyricPath, reason:$reason")
         val callback = lyricCallbackMap[requestId] ?: return
         val songCode = lyricSongCodeMap[requestId] ?: return
-        lyricCallbackMap.remove(lyricPath)
+        lyricCallbackMap.remove(requestId)
         if (reason == MccExStateReason.STATE_REASON_YSD_ERROR_TOKEN_ERROR) {
             // Token过期
             ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
@@ -1873,7 +1905,18 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
         offsetEnd: Int,
         reason: MccExStateReason
     ) {
-
+        Log.d("xiru", "onLyricResult, requestId:$requestId, songCode:$songCode, pitchPath:$pitchPath, reason:$reason")
+        val callback = pitchCallbackMap[requestId] ?: return
+        pitchCallbackMap.remove(requestId)
+        if (reason == MccExStateReason.STATE_REASON_YSD_ERROR_TOKEN_ERROR) {
+            // Token过期
+            ktvApiEventHandlerList.forEach { it.onTokenPrivilegeWillExpire() }
+        }
+        if (pitchPath == null || pitchPath.isEmpty()) {
+            callback(songCode, null)
+            return
+        }
+        callback(songCode, pitchPath)
     }
 
     override fun onPreLoadEvent(
@@ -1906,16 +1949,13 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
 
     // IMusicContentCenterExScoreEventHandler
     override fun onLineScore(songCode: Long, value: LineScoreData) {
-        Log.d("xiru", "onLineScore, songCode: $songCode, score: ${value.linePitchScore}")
         if (this.songCode == songCode) {
             this.singingScore = value.linePitchScore
         }
-        ktvApiEventHandlerList.forEach {
-            it.onLineScore(songCode, value)
-        }
+        lrcView?.onLineScore(songCode, value)
     }
 
     override fun onPitch(songCode: Long, data: RawScoreData) {
-
+        lrcView?.onPitch(songCode, data)
     }
 }

@@ -3,10 +3,12 @@ package io.agora.ktvapi
 // TODO add
 //import com.tuwan.twmusic.KTVSingRole
 //import com.tuwan.twmusic.TwILrcView
+import com.google.protobuf.Internal.BooleanList
 import io.agora.mccex.IMusicContentCenterEx
 import io.agora.mccex.constants.MccExState
 import io.agora.mccex.constants.MccExStateReason
 import io.agora.mccex.model.LineScoreData
+import io.agora.mccex.model.RawScoreData
 import io.agora.mediaplayer.Constants
 import io.agora.mediaplayer.IMediaPlayer
 import io.agora.rtc2.IRtcEngineEventHandler
@@ -114,10 +116,16 @@ interface ILrcView {
      */
     fun onUpdateProgress(progress: Long, position: Long)
 
+
+    fun onPitch(songCode: Long, data: RawScoreData)
+
+
+    fun onLineScore(songCode: Long, value: LineScoreData)
+
     /**
      * ktvApi获取到歌词地址时会主动调用此方法将歌词地址url传给你的歌词组件，您需要在这个回调内完成歌词的下载
      */
-    fun onDownloadLrcData(url: String?)
+    fun onDownloadLrcData(lyricPath: String?, pitchPath: String?)
 }
 
 /**
@@ -219,12 +227,6 @@ abstract class IKTVApiEventHandler {
         totalVolume: Int
     ) {
     }
-
-    open fun onLineScore(
-        songCode: Long, value: LineScoreData
-    ) {
-
-    }
 }
 
 /**
@@ -270,7 +272,8 @@ data class KTVLoadMusicConfiguration(
     val songIdentifier: String,
     val autoPlay: Boolean = false,
     val mainSingerUid: Int,
-    val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC
+    val mode: KTVLoadMusicMode = KTVLoadMusicMode.LOAD_MUSIC_AND_LRC,
+    val needPitch: Boolean = false
 )
 
 interface KTVApi {
