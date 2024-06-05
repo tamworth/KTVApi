@@ -7,6 +7,8 @@
 
 import UIKit
 import AgoraLyricsScoreEx
+import AgoraMccExService
+
 class KTVLyricView: UIView {
     var lrcView: KaraokeViewEx!
     override init(frame: CGRect) {
@@ -34,6 +36,8 @@ class KTVLyricView: UIView {
 }
 
 extension KTVLyricView: KTVLrcViewDelegate, KaraokeDelegateEx {
+    
+    
     func onUpdatePitch(pitch: Float) {
 //        lrcView.setPitch(pitch: Double(pitch))
     }
@@ -42,16 +46,26 @@ extension KTVLyricView: KTVLrcViewDelegate, KaraokeDelegateEx {
         lrcView.setProgress(progressInMs: UInt(progress))
     }
     
-    func onDownloadLrcData(url: String) {
-        //开始歌词下载
-//        let _ = downloadManager.download(urlString: url)
-        resetLrcData(with: url)
+    func onPitch(songCode: Int, data: AgoraRawScoreData) {
+        lrcView.setPitch(speakerPitch: data.speakerPitch, progressInMs: data.progressInMs)
     }
     
-    func resetLrcData(with url: String) {
-        let musicUrl = URL(fileURLWithPath: url)
-        guard let data = try? Data(contentsOf: musicUrl),
-              let model = KaraokeViewEx.parseLyricData(krcFileData: data, pitchFileData: nil) else {
+    func onLineScore(songCode: Int, value: AgoraLineScoreData) {
+        
+    }
+    
+    func onDownloadLrcData(lrcPath: String, pitchPath: String?) {
+        //开始歌词下载
+//        let _ = downloadManager.download(urlString: url)
+        resetLrcData(lyricPath: lrcPath, pitchPath: pitchPath)
+    }
+    
+    func resetLrcData(lyricPath: String, pitchPath: String?) {
+        let lyricUrl = URL(fileURLWithPath: lyricPath)
+        let pitchUrl = URL(fileURLWithPath: pitchPath ?? "")
+        let pitchData = try? Data(contentsOf: pitchUrl)
+        guard let data = try? Data(contentsOf: lyricUrl),
+              let model = KaraokeViewEx.parseLyricData(krcFileData: data, pitchFileData: pitchData) else {
             return
         }
         lrcView?.setLyricData(data: model)

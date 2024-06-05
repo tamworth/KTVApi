@@ -90,9 +90,10 @@ class KTVApiImpl: NSObject{
     public var mcc: AgoraMusicContentCenterEx?
 
     private var loadSongMap = Dictionary<String, KTVLoadSongState>()
-    private var lyricUrlMap = Dictionary<String, String>()
+//    private var lyricUrlMap = Dictionary<String, String>()
     private var loadDict = Dictionary<String, KTVLoadSongState>()
     private var lyricCallbacks = Dictionary<String, LyricCallback>()
+    private var pitchCallbacks = Dictionary<String, LyricCallback>()
     private var musicCallbacks = Dictionary<String, LoadMusicCallback>()
     private var scoreCallbacks = Dictionary<String, ScoreCallback>()
     
@@ -1047,19 +1048,17 @@ extension KTVApiImpl {
         }
         
         if mode == .loadLrcOnly {
-            loadLyric(with: songCode) { [weak self] url in
+            loadLyricAndPitch(needPitch: config.needPitch, songCode: songCode) { [weak self] lyricPath, pitchPath in
                 guard let self = self else { return }
-                agoraPrint("loadLrcOnly: songCode:\(self.songCode) ulr:\(String(describing: url))")
+                agoraPrint("loadLrcOnly: songCode:\(self.songCode) lyricPath:\(lyricPath ?? ""), pitchPath: \(pitchPath ?? "")")
 //                if self.songCode != songCode {
 //                    onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .cancled)
 //                    return
 //                }
-                if let urlPath = url, !urlPath.isEmpty {
-                    self.lyricUrlMap[String(self.songCode)] = urlPath
-                    self.setLyric(with: urlPath) { [weak self] lyricUrl in
-                        guard let self = self else { return }
-                        onMusicLoadStateListener.onMusicLoadSuccess(songCode: self.songCode, lyricUrl: urlPath)
-                    }
+                if let lyricPath = lyricPath, !lyricPath.isEmpty {
+//                    self.lyricUrlMap[String(self.songCode)] = lyricPath
+                    self.lrcControl?.onDownloadLrcData(lrcPath: lyricPath, pitchPath: pitchPath)
+                    onMusicLoadStateListener.onMusicLoadSuccess(songCode: self.songCode, lyricUrl: lyricPath)
                 } else {
                     onMusicLoadStateListener.onMusicLoadFail(songCode: self.songCode, reason: .noLyricUrl)
                 }
@@ -1090,18 +1089,17 @@ extension KTVApiImpl {
                 if status == .preloadOK {
                     if mode == .loadMusicAndLrc {
                         // 需要加载歌词
-                        self.loadLyric(with: songCode) { [weak self] url in
+                        self.loadLyricAndPitch(needPitch: config.needPitch, songCode: songCode) { [weak self] lyricPath, pitchPath in
                             guard let self = self else { return }
-                            agoraPrint("loadMusicAndLrc: songCode:\(songCode) status:\(status.rawValue) ulr:\(String(describing: url))")
+                            agoraPrint("loadMusicAndLrc: songCode:\(songCode) status:\(status.rawValue) lyricPath:\(lyricPath ?? "") pitchPath: \(pitchPath ?? "")")
                             if self.songCode != songCode {
                                 onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .cancled)
                                 return
                             }
-                            if let urlPath = url, !urlPath.isEmpty {
-                                self.lyricUrlMap[String(songCode)] = urlPath
-                                self.setLyric(with: urlPath) { lyricUrl in
-                                    onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: urlPath)
-                                }
+                            if let lyricPath = lyricPath, !lyricPath.isEmpty {
+//                                self.lyricUrlMap[String(songCode)] = lyricPath
+                                self.lrcControl?.onDownloadLrcData(lrcPath: lyricPath, pitchPath: pitchPath)
+                                onMusicLoadStateListener.onMusicLoadSuccess(songCode: songCode, lyricUrl: lyricPath)
                             } else {
                                 onMusicLoadStateListener.onMusicLoadFail(songCode: songCode, reason: .noLyricUrl)
                             }
@@ -1135,10 +1133,42 @@ extension KTVApiImpl {
         }
     }
     
+    private func loadLyricAndPitch(needPitch: Bool, songCode: NSInteger, callBack:@escaping LyricAndPitchCallback) {
+        agoraPrint("loadLyricAndPitch songCode: \(songCode)")
+        var lyricPath: String? = nil
+        var pitchPath: String? = nil
+        
+        func checkCompletion() {
+            guard let lyricPath = lyricPath, let pitchPath = pitchPath else { return }
+            callBack(lyricPath, pitchPath)
+        }
+        
+        if needPitch {
+            loadPitch(with: songCode) { pitchUrl in
+                pitchPath = pitchUrl ?? ""
+                checkCompletion()
+            }
+        } else {
+            pitchPath = ""
+            checkCompletion()
+        }
+        
+        loadLyric(with: songCode) { lyricUrl in
+            lyricPath = lyricUrl ?? ""
+            checkCompletion()
+        }
+    }
+    
     private func loadLyric(with songCode: NSInteger, callBack:@escaping LyricCallback) {
         agoraPrint("loadLyric songCode: \(songCode)")
         let requestId: String = self.mcc?.getLyric(songCode, lyricType: .KRC) ?? ""
         self.lyricCallbacks.updateValue(callBack, forKey: requestId)
+    }
+    
+    private func loadPitch(with songCode: NSInteger, callBack:@escaping LyricCallback) {
+        agoraPrint("loadPitch songCode: \(songCode)")
+        let requestId: String = self.mcc?.getPitch(songCode) ?? ""
+        self.pitchCallbacks.updateValue(callBack, forKey: requestId)
     }
     
     private func preloadMusic(with songCode: Int, callback: @escaping LoadMusicCallback) {
@@ -1156,12 +1186,6 @@ extension KTVApiImpl {
             return
         }
         musicCallbacks.updateValue(callback, forKey: String(songCode))
-    }
-    
-    private func setLyric(with url: String, callBack: @escaping LyricCallback) {
-        agoraPrint("setLyric url: (url)")
-        self.lrcControl?.onDownloadLrcData(url: url)
-        callBack(url)
     }
 
     func startSing(songCode: Int, startPos: Int) {
@@ -1870,19 +1894,35 @@ extension KTVApiImpl: AgoraMusicContentCenterExEventDelegate {
     
     func onPitchResult(_ requestId: String, songCode: Int, pitchPath: String?, offsetBegin: Int, offsetEnd: Int, reason: AgoraMusicContentCenterExStateReason) {
         agoraPrint("onPitchResult[\(songCode)] reason: \(reason.rawValue)")
+        DispatchQueue.main.async {
+            guard let pitchPath = pitchPath else {return}
+            let callback = self.pitchCallbacks[requestId]
+            guard let pitchCallback = callback else { return }
+            self.pitchCallbacks.removeValue(forKey: requestId)
+            //        if (reason == .errorGateway) {
+            //            getEventHander { delegate in
+            //                delegate.onTokenPrivilegeWillExpire()
+            //            }
+            //        }
+            if pitchPath.isEmpty {
+                pitchCallback(nil)
+                TWLog("onPitchResult: pitchPath.isEmpty")
+                return
+            }
+            pitchCallback(pitchPath)
+            TWLog("onPitchResult: pitchPath is \(pitchPath)")
+        }
     }
 }
 
 //MARK: AgoraMusicContentCenterExScoreEventDelegate
 extension KTVApiImpl: AgoraMusicContentCenterExScoreEventDelegate {
     func onPitch(_ songCode: Int, data: AgoraRawScoreData) {
-        
+        lrcControl?.onPitch(songCode: songCode, data: data)
     }
     
     func onLineScore(_ songCode: Int, value: AgoraLineScoreData) {
-        getEventHander { delegate in
-            delegate.onLineScore(songCode: songCode, value: value)
-        }
+        lrcControl?.onLineScore(songCode: songCode, value: value)
     }
 }
 

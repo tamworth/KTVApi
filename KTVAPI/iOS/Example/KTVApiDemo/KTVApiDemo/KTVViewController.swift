@@ -373,6 +373,7 @@ class KTVViewController: UIViewController {
             }
             songConfig.mainSingerUid = mainSingerId
             songConfig.songIdentifier = "\(mccSongCode)"
+            songConfig.needPitch = true
             ktvApi.loadMusic(songCode: mccSongCode, config: songConfig, onMusicLoadStateListener: self)
             
             self.loadMusicCallBack = {[weak self] flag, songCode in

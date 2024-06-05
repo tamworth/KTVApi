@@ -128,7 +128,9 @@ public enum KTVMusicDownloadState {
 @objc public protocol KTVLrcViewDelegate {
     func onUpdatePitch(pitch: Float)
     func onUpdateProgress(progress: Int)
-    func onDownloadLrcData(url: String)
+    func onPitch(songCode: Int, data: AgoraRawScoreData)
+    func onLineScore(songCode: Int, value: AgoraLineScoreData)
+    func onDownloadLrcData(lrcPath: String, pitchPath: String?)
     /// 492KTV歌房使用
     @objc optional func receiveStreamMessage(content: NSDictionary)
 }
@@ -143,13 +145,7 @@ public enum KTVMusicDownloadState {
     func onMusicPlayerStateChanged(state: AgoraMediaPlayerState,
                                    error: AgoraMediaPlayerError,
                                    isLocal: Bool)
-    
-    
-    /// 歌曲得分回调
-    /// - Parameter score: <#score description#>
-    func onLineScore(songCode: Int, value: AgoraLineScoreData)
 
-    
     /// 角色切换回调
     /// - Parameters:
     ///   - oldRole: <#oldRole description#>
@@ -218,10 +214,12 @@ public enum KTVMusicDownloadState {
     public var autoPlay: Bool = false   //是否加载完成自动播放
     public var mainSingerUid: Int = 0     //主唱uid
     public var mode: KTVLoadMusicMode = .loadMusicAndLrc
+    public var needPitch: Bool = false
 }
 
 
 public typealias LyricCallback = ((String?) -> Void)
+public typealias LyricAndPitchCallback = ((String?, String?) -> Void)
 public typealias LoadMusicCallback = ((AgoraMusicContentCenterExState, NSInteger) -> Void)
 public typealias ScoreCallback = ((AgoraMusicContentCenterExState, NSInteger) -> Void)
 public typealias ISwitchRoleStateListener = (KTVSwitchRoleState, KTVSwitchRoleFailReason) -> Void
