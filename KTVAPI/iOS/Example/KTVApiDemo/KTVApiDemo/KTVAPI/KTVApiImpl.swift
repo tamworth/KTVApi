@@ -1918,11 +1918,17 @@ extension KTVApiImpl: AgoraMusicContentCenterExEventDelegate {
 //MARK: AgoraMusicContentCenterExScoreEventDelegate
 extension KTVApiImpl: AgoraMusicContentCenterExScoreEventDelegate {
     func onPitch(_ songCode: Int, data: AgoraRawScoreData) {
-        lrcControl?.onPitch(songCode: songCode, data: data)
+        guard self.songCode == songCode else {return}
+        DispatchQueue.main.async {
+            self.lrcControl?.onPitch(songCode: songCode, data: data)
+        }
     }
     
     func onLineScore(_ songCode: Int, value: AgoraLineScoreData) {
-        lrcControl?.onLineScore(songCode: songCode, value: value)
+        guard self.songCode == songCode else {return}
+        DispatchQueue.main.async {
+            self.lrcControl?.onLineScore(songCode: songCode, value: value)
+        }
     }
 }
 
