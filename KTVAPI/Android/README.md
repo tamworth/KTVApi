@@ -59,8 +59,205 @@
 
 ---
 
-## 3. 如何集成场景化 API 实现 K 歌场景
-详见[**官网文档**](https://doc.shengwang.cn/doc/online-ktv/android/implementation/ktv-scenario/get-music)
+## 3. 如何集成场景化 API 实现 K 歌场景(音速达)
+
+1、初始化 KTVAPI 需要传入 mccEx 对象
+~~~kotlin
+// ------------------ 初始化内容中心 ------------------
+val contentCenterConfiguration = MusicContentCenterExConfiguration()
+contentCenterConfiguration.context = context
+contentCenterConfiguration.vendorConfigure = YsdVendorConfigure(
+    appId = BuildConfig.YSD_APP_ID,
+    appKey = BuildConfig.YSD_APP_Key,
+    token = BuildConfig.YSD_APP_TOKEN,
+    userId = BuildConfig.YSD_USERID,
+    deviceId = "Device ID",
+    chargeMode = ChargeMode.ONCE,
+    urlTokenExpireTime = 60 * 15
+)
+contentCenterConfiguration.enableLog = true
+contentCenterConfiguration.enableSaveLogToFile = true
+contentCenterConfiguration.logFilePath = context?.getExternalFilesDir(null)?.path
+
+val mMusicCenter = IMusicContentCenterEx.create(RtcEngineController.rtcEngine)!!
+mMusicCenter.initialize(contentCenterConfiguration)
+
+// ------------------ 初始化 KTVAPI ------------------
+val ktvapi = GiantChorusKTVApiImpl()
+val ktvApiConfig = KTVApiConfig(
+    BuildConfig.AGORA_APP_ID,
+    mMusicCenter, // 传入mMusicCenter对象
+    RtcEngineController.rtcEngine,
+    KeyCenter.channelId,             // 演唱频道channelId
+    KeyCenter.localUid,              // uid
+    MPKUID,                          // mpk uid
+    KeyCenter.channelId  + "_ad",    // 观众频道channelId
+    RtcEngineController.chorusChannelToken,        // 演唱频道channelId + uid = 加入演唱频道的token
+    RtcEngineController.musicStreamToken,          // 演唱频道channelId + mpk uid = mpk 流加入频道的token
+    10,
+    KTVType.Cantata,åå
+    false,
+    KTVMusicType.SONG_CODE,
+    0
+)
+ktvApi.initialize(ktvApiConfig)
+~~~
+
+2、注册歌词组件对象
+~~~kotlin
+// karaokeView 为歌词组件UI对象
+ktvApi.setLrcView(object : ILrcView {
+    // 进度
+    override fun onUpdateProgress(progress: Long, position: Long) {
+        karaokeView?.setProgress(progress)
+    }
+
+    // 音高线
+    override fun onPitch(songCode: Long, data: RawScoreData) {
+        karaokeView?.setPitch(data.speakerPitch, data.progressInMs)
+    }
+
+    // 单句打分
+    override fun onLineScore(songCode: Long, value: LineScoreData) {
+
+    }
+
+    // 歌词和音高文件
+    override fun onDownloadLrcData(lyricPath: String?, pitchPath: String?) {
+        lyricPath?.let { lrc ->
+            pitchPath?.let { pitch ->
+                val mLyricsModel = KaraokeView.parseLyricData(File(lrc), File(pitch))
+                if (mLyricsModel != null) {
+                    karaokeView?.setLyricData(mLyricsModel)
+                }
+            }
+        }
+    }
+})
+~~~
+
+3、加载播放歌曲
+~~~kotlin
+// --------------- 主唱&合唱 -----------------
+// 使用声网版权中心歌单
+val musicConfiguration = KTVLoadMusicConfiguration(
+    歌曲唯一ID, 
+    false, 
+    KeyCenter.LeadSingerUid, // 主唱UID
+    KTVLoadMusicMode.LOAD_MUSIC_AND_LRC, // 加载歌曲和歌词
+    true // 是否需要获取音高文件, 不渲染音高线的场景传false
+)
+ktvApi.loadMusic(
+  音速达songID, 
+  musicConfiguration, 
+  object : IMusicLoadStateListener {
+    // 下载成功
+    override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
+        // 开启打分, 如果不需要打分可以取消这一步
+        ktvApi.startScore(KeyCenter.songCode) { _, state, _ ->
+            // 成功开启打分
+            if (state == MccExState.START_SCORE_STATE_COMPLETED) {
+                // 切换身份成领唱
+                if (KeyCenter.isLeadSinger()) {
+                    ktvApi.switchSingerRole(KTVSingRole.LeadSinger, object : ISwitchRoleStateListener {
+                        override fun onSwitchRoleSuccess() {
+                            // 切换身份成功开始播放音乐, 这里的songCode要传 loadMusicSuccess回调返回的
+                            ktvApi.startSing(songCode, 0)
+                        }
+
+                        override fun onSwitchRoleFail(reason: SwitchRoleFailReason) {
+
+                        }
+
+                        override fun onJoinChorusChannelSuccess(
+                            channel: String,
+                            uid: Int
+                        ) {
+
+                        }
+                    })
+                // 切换身份成合唱, 合唱不用主动调用startSing就可以开始播放音乐!!!
+                } else if (KeyCenter.isCoSinger()) {
+                    ktvApi.switchSingerRole(KTVSingRole.CoSinger, object : ISwitchRoleStateListener {
+                        override fun onSwitchRoleSuccess() {
+
+                        }
+
+                        override fun onSwitchRoleFail(reason: SwitchRoleFailReason) {
+
+                        }
+
+                        override fun onJoinChorusChannelSuccess(
+                            channel: String,
+                            uid: Int
+                        ) {
+
+                        }
+                    })
+                }
+            }
+        }
+    }
+
+    // 下载失败
+    override fun onMusicLoadFail(songCode: Long, reason: KTVLoadSongFailReason) {
+        Log.d("Music", "onMusicLoadFail, songCode: $songCode, reason: $reason")
+    }
+
+    // 下载进度
+    override fun onMusicLoadProgress(
+        songCode: Long,
+        percent: Int,
+        status: MusicLoadStatus,
+        msg: String?,
+        lyricUrl: String?
+    ) {
+        Log.d("Music", "onMusicLoadProgress, songCode: $songCode, percent: $percent")
+        lyricsView.post {
+            tvMusicProcess.text = "下载进度：$percent%"
+        }
+    }
+})
+
+// --------------- 观众 -----------------
+// 使用声网版权中心歌单
+val musicConfiguration = KTVLoadMusicConfiguration(
+    歌曲唯一ID, 
+    false, 
+    KeyCenter.LeadSingerUid, // 主唱UID
+    KTVLoadMusicMode.LOAD_LRC_ONLY, // 观众只加载歌词
+    false // 是否需要获取音高文件, 不渲染音高线的场景传false
+)
+ktvApi.loadMusic(
+  音速达songID, 
+  musicConfiguration, 
+  object : IMusicLoadStateListener {
+    // 下载成功
+    override fun onMusicLoadSuccess(songCode: Long, lyricUrl: String) {
+        
+    }
+
+    // 下载失败
+    override fun onMusicLoadFail(songCode: Long, reason: KTVLoadSongFailReason) {
+        Log.d("Music", "onMusicLoadFail, songCode: $songCode, reason: $reason")
+    }
+
+    // 下载进度
+    override fun onMusicLoadProgress(
+        songCode: Long,
+        percent: Int,
+        status: MusicLoadStatus,
+        msg: String?,
+        lyricUrl: String?
+    ) {
+        Log.d("Music", "onMusicLoadProgress, songCode: $songCode, percent: $percent")
+        lyricsView.post {
+            tvMusicProcess.text = "下载进度：$percent%"
+        }
+    }
+~~~
+
+
 
 ## 4. FAQ
 - 集成遇到困难，该如何联系声网获取协助

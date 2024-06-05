@@ -12,7 +12,7 @@ import io.agora.mccex.constants.MccExState
 import io.agora.mccex.constants.MccExStateReason
 import io.agora.mccex.model.LineScoreData
 import io.agora.mccex.model.RawScoreData
-// TODO
+// TODO diandian
 //import com.tuwan.android.uitl.mmkv.MmkvDataUtils
 //import com.tuwan.twmusic.KTVSingRole
 //import com.tuwan.twmusic.TwILrcView
@@ -91,7 +91,7 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
     private val musicCollectionCallbackMap =
         mutableMapOf<String, (requestId: String?, errorCode: Int, page: Int, pageSize: Int, total: Int, list: Array<out Music>?) -> Unit>()
 
-    private var lrcView: ILrcView? = null // TODO modify
+    private var lrcView: ILrcView? = null // TODO diandian
 
     private var localPlayerPosition: Long = 0
     private var localPlayerSystemTime: Long = 0
@@ -143,27 +143,6 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
         this.ktvApiConfig = config
         this.ktvScene = config.ktvScene
 
-        // ------------------ 初始化内容中心 ------------------
-//        val contentCenterConfiguration = MusicContentCenterExConfiguration()
-//        contentCenterConfiguration.context = config.context
-//        contentCenterConfiguration.eventHandler = this
-//        contentCenterConfiguration.vendorConfigure = YsdVendorConfigure(
-//            appId = "203277",
-//            appKey = "ac8e699bb7c94de893a67fa7de59212f",
-//            token = "KNH5KJVBH2UML9GFB5O20HKGP47MOTU5LA5VT431JD0KG0NISDVM5CHJ6NCUTR13LRICSE897SBJQL2VQO9BTRKKAEN98489BI64BC6Q6JDAOHT2N01G4UG765O51JCN2JPKA0DD1TE3SQ4GGDINCNE7PC93409MDCSQSLAS2BVGUCBJS2711DLF04Q7VU9Q",
-//            userId = "4AB8152067F0622F5A225CFCC4E282BD",
-//            deviceId = "2323",
-//            chargeMode = ChargeMode.ONCE,
-//            urlTokenExpireTime = 60 * 15
-//        )
-//        contentCenterConfiguration.scoreEventHandler = this
-//        contentCenterConfiguration.enableLog = true
-//        contentCenterConfiguration.enableSaveLogToFile = true
-//
-//        mMusicCenter = IMusicContentCenterEx.create(mRtcEngine)!!
-//
-//        mMusicCenter.initialize(contentCenterConfiguration)
-
         mMusicCenter = config.mMusicCenter
         mMusicCenter.registerEventHandler(this)
         mMusicCenter.registerScoreEventHandler(this)
@@ -197,7 +176,7 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
 
     //用于合唱对齐的参数
     private fun setKTVParameters() {
-//        mRtcEngine.setParameters("{\"rtc.enable_nasa2\": false}")
+        mRtcEngine.setParameters("{\"rtc.enable_nasa2\": true}")
         mRtcEngine.setParameters("{\"rtc.use_audio4\": true}")
         mRtcEngine.setParameters("{\"rtc.ntp_delay_drop_threshold\":1000}")
         mRtcEngine.setParameters("{\"rtc.video.enable_sync_render_ntp\": true}")
@@ -216,7 +195,7 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
         mRtcEngine.setParameters("{\"che.audio.uplink_apm_async_process\": true}")
 
         // Android Only
-        // TODO modify
+        // TODO diandian 这里理论上要放开以复原
 //        val isOpenDeviceDelay = MmkvDataUtils.getInstance().readBoolean("isOpenDeviceDelay", false)
 //        if (isOpenDeviceDelay) {
 //            mRtcEngine.setParameters("{\"che.audio.enable_estimated_device_delay\":false}")
@@ -634,7 +613,7 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
         syncPlayProgress(time)
     }
 
-    override fun setLrcView(view: ILrcView?) { // TODO modify
+    override fun setLrcView(view: ILrcView?) { // TODO diandian
         Log.d(TAG, "setLrcView called")
         this.lrcView = view
     }
@@ -1553,7 +1532,7 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
                 if (info.uid == 0) {
                     pitch =
                         if (this.mediaPlayerState == MediaPlayerState.PLAYER_STATE_PLAYING
-                            // && (RTCAgoraApi.hasOpenLicaoAudio || RTCChannelApi.hasChannelOpenLicaoAudio) // TODO modify
+                            // && (RTCAgoraApi.hasOpenLicaoAudio || RTCChannelApi.hasChannelOpenLicaoAudio) // TODO diandian 理论上要放开
                         ) {
                             info.voicePitch
                         } else {
@@ -1715,25 +1694,6 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
     override fun onAudioVolumeIndication(volume: Int) {}
 
     //业务自定义的功能方法
-    /**
-     * 获取缓存中所有的歌曲
-     */
-    // TODO hide
-//    override fun getAllCache(): List<MusicCacheInfo>? {
-//        if (this::mMusicCenter.isInitialized) {
-//            return mMusicCenter.caches.toList()
-//        }
-//        return null
-//    }
-//
-//    /**
-//     * 移除缓存中某个歌曲
-//     */
-//    override fun removeCache(songCode: Long) {
-//        if (this::mMusicCenter.isInitialized) {
-//            mMusicCenter.removeCache(songCode)
-//        }
-//    }
 
     /**
      * 调整本地播放音量
@@ -1882,7 +1842,7 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
         offsetEnd: Int,
         reason: MccExStateReason
     ) {
-        Log.d("xiru", "onLyricResult, requestId:$requestId, songCode:$songCode, lyricPath:$lyricPath, reason:$reason")
+        Log.d(TAG, "onLyricResult, requestId:$requestId, songCode:$songCode, lyricPath:$lyricPath, reason:$reason")
         val callback = lyricCallbackMap[requestId] ?: return
         val songCode = lyricSongCodeMap[requestId] ?: return
         lyricCallbackMap.remove(requestId)
@@ -1905,7 +1865,7 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
         offsetEnd: Int,
         reason: MccExStateReason
     ) {
-        Log.d("xiru", "onLyricResult, requestId:$requestId, songCode:$songCode, pitchPath:$pitchPath, reason:$reason")
+        Log.d(TAG, "onLyricResult, requestId:$requestId, songCode:$songCode, pitchPath:$pitchPath, reason:$reason")
         val callback = pitchCallbackMap[requestId] ?: return
         pitchCallbackMap.remove(requestId)
         if (reason == MccExStateReason.STATE_REASON_YSD_ERROR_TOKEN_ERROR) {
@@ -1930,7 +1890,7 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
         state: MccExState,
         reason: MccExStateReason
     ) {
-        Log.d("xiru", "onPreLoadEvent, requestId:$requestId, songCode:$songCode, percent:$percent, lyricPath:$lyricPath, pitchPath:$pitchPath, state:$state, reason:$reason")
+        Log.d(TAG, "onPreLoadEvent, requestId:$requestId, songCode:$songCode, percent:$percent, lyricPath:$lyricPath, pitchPath:$pitchPath, state:$state, reason:$reason")
         val callback = loadMusicCallbackMap[songCode.toString()] ?: return
         if (state == MccExState.PRELOAD_STATE_COMPLETED || state == MccExState.PRELOAD_STATE_FAILED || state == MccExState.PRELOAD_STATE_REMOVED) {
             loadMusicCallbackMap.remove(songCode.toString())
@@ -1943,6 +1903,7 @@ class GiantChorusKTVApiImpl : KTVApi, IMediaPlayerObserver,
     }
 
     override fun onStartScoreResult(songCode: Long, state: MccExState, reason: MccExStateReason) {
+        Log.d(TAG, "onStartScoreResult, songCode:$songCode, state:$state, reason:$reason")
         val callback = startScoreMap.remove(songCode.toString())
         callback?.invoke(songCode, state, reason)
     }
