@@ -44,9 +44,9 @@ class NetworkManager:NSObject {
             kAppOS: kAppOSValue,
             kAppVersion: "0.0.1"
         ]
-        if KeyCenter.Token?.count ?? 0 > 0  {
-            config.httpAdditionalHeaders?["Authorization"] = KeyCenter.Token
-        }
+//        if KeyCenter.Token?.count ?? 0 > 0  {
+//            config.httpAdditionalHeaders?["Authorization"] = KeyCenter.Token
+//        }
         config.timeoutIntervalForRequest = 30
         config.timeoutIntervalForResource = 30
         config.requestCachePolicy = .reloadIgnoringLocalCacheData

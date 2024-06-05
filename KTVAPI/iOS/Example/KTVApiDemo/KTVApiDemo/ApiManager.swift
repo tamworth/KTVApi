@@ -2,9 +2,9 @@ import Foundation
 class ApiManager {
     static let shared = ApiManager()
     
-   // private let domain = "https://api.sd-rtn.com"
-    private let domain: String = "http://218.205.37.50:16000"
-    private let testIp: String = "218.205.37.50"
+    private let domain = "https://api.sd-rtn.com"
+    //private let domain: String = "http://218.205.37.50:16000"
+    //private let testIp: String = "218.205.37.50"
     
     private let TAG = "ApiManager"
     
@@ -26,8 +26,7 @@ class ApiManager {
             let timeInterval: TimeInterval = Date().timeIntervalSince1970
             let millisecond = CLongLong(round(timeInterval*1000))
             let acquireOjb = try JSONSerialization.data(withJSONObject: [
-                "instanceId": "\(Int(millisecond))",
-                "testIp": testIp,
+                "instanceId": "\(Int(millisecond))"
             ])
 
             let url = getTokenUrl(domain: domain, appId: KeyCenter.AppId)

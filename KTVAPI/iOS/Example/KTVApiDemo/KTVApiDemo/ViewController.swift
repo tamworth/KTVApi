@@ -47,7 +47,7 @@ class ViewController: UIViewController {
     }
     
     @IBAction func ktvTypeChange(_ sender: UISegmentedControl) {
-        isCantata = sender.selectedSegmentIndex == 0 ? false : true
+//        isCantata = sender.selectedSegmentIndex == 0 ? false : true
     }
     
     @IBAction func startSing(_ sender: UIButton) {
